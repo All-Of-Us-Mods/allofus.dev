@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IL2CPP Mono Method Analyzer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    #searchInput, #tagFilter, #typeFilter {
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      width: 100%;
+      box-sizing: border-box;
+      flex: 1;
+    }
+    .table-container {
+      width: 100%;
+      max-height: 65vh; /* Adjust this value as needed */
+      overflow-y: auto;
+      background-color: white;
+      border: 1px solid #ddd; /* Added border to match table style */
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      table-layout: fixed;
+      margin-top: -1px; /* This pulls the table up to eliminate the gap */
+    }
+    thead {
+      position: sticky;
+      top: -1px; /* Adjusted to account for the negative margin */
+      z-index: 10;
+    }
+    th, td {
+      padding: 6px 8px;
+      border: 1px solid #ddd;
+      text-align: left;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    th {
+      background-color: #f0f0f0;
+      cursor: pointer;
+      position: relative;
+      border-top: none; /* Remove top border to prevent double border */
+    }
+    th.sort-asc::after {
+      content: "▲";
+      position: absolute;
+      right: 8px;
+    }
+    th.sort-desc::after {
+      content: "▼";
+      position: absolute;
+      right: 8px;
+    }
+    th:nth-child(1) { width: 45%; }
+    th:nth-child(2) { width: 15%; }
+    th:nth-child(3) { width: 7%; }
+    th:nth-child(4) { width: 7%; }
+    th:nth-child(5) { width: 8%; }
+    th:nth-child(6) { width: 8%; }
+
+    .tag {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .inlined {
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
+    .used-by-inline {
+      background-color: #f8d7da;
+      color: #842029;
+    }
+    .stripped {
+      background-color: #e2e3e5;
+      color: #41464b;
+    }
+    .matched {
+      background-color: #cfe2ff;
+      color: #084298;
+    }
+    .highlight {
+      background-color: yellow;
+      font-weight: bold;
+    }
+    .filters {
+        display: flex;
+        gap: 10px;
+        margin: 10px 0;
+    }
+    #searchInput {
+      flex: 4;
+    }
+    .count-display {
+      margin-top: 10px;
+      font-size: 20px; 
+      color: #222;
+      padding: 5px;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <h1>IL2CPP Mono Methods Analyzer</h1>
+  <input type="file" id="fileInput" accept="application/json" />
+  <div class="filters">
+    <input type="text" id="searchInput" placeholder="Search methods..." />
+    <select id="tagFilter">
+      <option value="">All Tags</option>
+      <option value="inlined">Potentially Inlined</option>
+      <option value="used-by-inline">Potentially used by Inlined method</option>
+      <option value="stripped">Potentially Stripped</option>
+      <option value="matched">Matched</option>
+    </select>
+    <select id="typeFilter">
+      <option value="">All Types</option>
+      <option value="Method">Method</option>
+      <option value="Property">Property</option>
+    </select>
+  </div>
+  <div id="countDisplay" class="count-display">0/0</div>
+  <div class="table-container">
+    <table id="methodsTable">
+      <thead>
+        <tr>
+          <th data-sort="method">Method</th>
+          <th data-sort="ReturnType">Return Type</th>
+          <th data-sort="MonoCount">Mono Count</th>
+          <th data-sort="XrefCount">Xref Count</th>
+          <th data-sort="Type">Type</th>
+          <th data-sort="tag">Tag</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script> let methodData = {};
+    let sortField = null;
+    let sortAsc = true;
+    let searchTimeout = null;
+    let totalCount = 0;
+    let filteredCount = 0;
+
+    function updateCountDisplay() {
+      document.getElementById("countDisplay").textContent = `${filteredCount}/${totalCount}`;
+    }
+
+    function highlightMatch(text, filter) {
+      if (!filter) return text;
+      const escaped = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escaped})`, 'gi');
+      return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    function renderTable(filter = "", tagFilter = "", typeFilter = "") {
+      requestAnimationFrame(() => {
+        const tbody = document.querySelector("#methodsTable tbody");
+        tbody.innerHTML = "";
+
+        let entries = Object.entries(methodData).map(([method, { ReturnType, MonoCount, XrefCount, IsProperty, IsStripped }]) => {
+          let tag = "Matched";
+          let tagClass = "matched";
+
+          if (MonoCount > XrefCount) {
+            tag = "Potentially Inlined";
+            tagClass = "inlined";
+          } else if (XrefCount > MonoCount) {
+            tag = "Potentially used by Inlined method";
+            tagClass = "used-by-inline";
+          }
+
+          if (IsStripped) {
+            tag = "Potentially Stripped";
+            tagClass = "stripped";
+          }
+
+          const type = IsProperty ? "Property" : "Method";
+
+          let rank = 2;
+          const lowerMethod = method.toLowerCase();
+          const lowerFilter = filter.toLowerCase();
+
+          if (!filter) {
+            rank = -1;
+          } else if (lowerMethod === lowerFilter) {
+            rank = 0;
+          } else if (lowerMethod.includes(lowerFilter)) {
+            rank = 1;
+          } else {
+            return null;
+          }
+
+          return { method, ReturnType, MonoCount, XrefCount, type, tag, tagClass, rank };
+        }).filter(Boolean);
+
+        // Update total count (only once when data loads)
+        if (totalCount === 0) {
+          totalCount = entries.length;
+        }
+
+        // Filter entries based on tag and type
+        let filteredEntries = entries.filter(entry => {
+          const tagMatch = !tagFilter || entry.tagClass === tagFilter;
+          const typeMatch = !typeFilter || entry.type === typeFilter;
+          return tagMatch && typeMatch;
+        });
+
+        filteredCount = filteredEntries.length;
+
+        // Sort the filtered entries
+        filteredEntries.sort((a, b) => {
+          if (a.rank !== b.rank) return a.rank - b.rank;
+          if (sortField) {
+            const valA = a[sortField];
+            const valB = b[sortField];
+            if (valA < valB) return sortAsc ? -1 : 1;
+            if (valA > valB) return sortAsc ? 1 : -1;
+            return 0;
+          }
+          return 0;
+        });
+
+        const fragment = document.createDocumentFragment();
+        for (const entry of filteredEntries) {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${highlightMatch(entry.method, filter)}</td>
+            <td>${entry.ReturnType}</td>
+            <td>${entry.MonoCount}</td>
+            <td>${entry.XrefCount}</td>
+            <td>${entry.type}</td>
+            <td><span class="tag ${entry.tagClass}">${entry.tag}</span></td>
+          `;
+          fragment.appendChild(row);
+        }
+        tbody.appendChild(fragment);
+        
+        // Update the count display
+        updateCountDisplay();
+      });
+    }
+
+    // Debounce function to limit how often a function is called
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+      };
+    }
+
+    // Create a debounced version of renderTable
+    const debouncedRenderTable = debounce(renderTable, 300);
+
+    document.getElementById("fileInput").addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          methodData = JSON.parse(e.target.result);
+          totalCount = 0; // Reset total count when new data loads
+          renderTable();
+        } catch (err) {
+          alert("Invalid JSON file");
+          console.error(err);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById("fileInput").addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          methodData = JSON.parse(e.target.result);
+          renderTable();
+        } catch (err) {
+          alert("Invalid JSON file");
+          console.error(err);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById("searchInput").addEventListener("input", function (e) {
+      // Use the debounced version instead of calling renderTable directly
+      debouncedRenderTable(
+        e.target.value, 
+        document.getElementById("tagFilter").value, 
+        document.getElementById("typeFilter").value
+      );
+    });
+
+    document.getElementById("tagFilter").addEventListener("change", function (e) {
+      renderTable(
+        document.getElementById("searchInput").value, 
+        e.target.value, 
+        document.getElementById("typeFilter").value
+      );
+    });
+
+    document.getElementById("typeFilter").addEventListener("change", function (e) {
+      renderTable(
+        document.getElementById("searchInput").value, 
+        document.getElementById("tagFilter").value, 
+        e.target.value
+      );
+    });
+
+    document.querySelectorAll("th[data-sort]").forEach(th => {
+      th.addEventListener("click", () => {
+        const field = th.getAttribute("data-sort");
+        if (sortField === field) {
+          sortAsc = !sortAsc;
+        } else {
+          sortField = field;
+          sortAsc = true;
+        }
+        document.querySelectorAll("th").forEach(th => th.classList.remove("sort-asc", "sort-desc"));
+        th.classList.add(sortAsc ? "sort-asc" : "sort-desc");
+        renderTable(
+          document.getElementById("searchInput").value, 
+          document.getElementById("tagFilter").value, 
+          document.getElementById("typeFilter").value
+        );
+      });
+    });
+  </script>
+</body>
+</html>
