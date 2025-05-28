@@ -15,21 +15,21 @@
     }
     .table-container {
       width: 100%;
-      max-height: 65vh; /* Adjust this value as needed */
+      max-height: 65vh;
       overflow-y: auto;
       background-color: white;
-      border: 1px solid #ddd; /* Added border to match table style */
+      border: 1px solid #ddd;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
       table-layout: fixed;
-      margin-top: -1px; /* This pulls the table up to eliminate the gap */
+      margin-top: -1px;
     }
     thead {
       position: sticky;
-      top: -1px; /* Adjusted to account for the negative margin */
+      top: -1px;
       z-index: 10;
     }
     th, td {
@@ -43,7 +43,7 @@
       background-color: #f0f0f0;
       cursor: pointer;
       position: relative;
-      border-top: none; /* Remove top border to prevent double border */
+      border-top: none;
     }
     th.sort-asc::after {
       content: "▲";
@@ -92,7 +92,7 @@
       display: flex;
       gap: 10px;
       margin: 10px 0;
-      flex-wrap: wrap; /* Allow wrapping on small screens */
+      flex-wrap: wrap;
     }
 
     #searchInput, #returnTypeInput, #tagFilter, #typeFilter {
@@ -100,7 +100,7 @@
       padding: 6px 10px;
       box-sizing: border-box;
       flex: 1;
-      min-width: 150px; /* Prevent inputs from getting too narrow */
+      min-width: 150px;
     }
     #searchInput {
       flex: 4;
@@ -119,7 +119,7 @@
 
     .usage-window {
       position: fixed;
-      width: 500px;
+      width: 600px;
       max-height: 60vh;
       background-color: white;
       border: 1px solid #ddd;
@@ -133,7 +133,7 @@
     }
     
     .usage-window:not(:first-of-type) {
-      margin-top: 30px; /* Stagger new windows */
+      margin-top: 30px;
     }
     
     .window-header {
@@ -153,7 +153,7 @@
     
     .window-close {
       cursor: pointer;
-      font-size: 18px;
+      font-size: 36px;
       line-height: 1;
     }
     
@@ -179,13 +179,81 @@
       font-style: italic;
     }
     
-    /* Make table rows clickable */
     #methodsTable tbody tr {
       cursor: pointer;
     }
     
     #methodsTable tbody tr:hover {
       background-color: #f5f5f5;
+    }
+
+    .usage-section {
+      margin-bottom: 20px;
+    }
+
+    .usage-section h4 {
+      margin: 0 0 8px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #eee;
+      color: #555;
+    }
+
+    .mono-only {
+      background-color: rgba(213, 245, 227, 0.3);
+      border-left: 3px solid #0f5132;
+      padding-left: 5px;
+    }
+
+    .xref-only {
+      background-color: rgba(255, 231, 217, 0.3);
+      border-left: 3px solid #0f5132;
+      padding-left: 5px;
+    }
+
+    .usage-item.common {
+      border-left: 3px solid #cfe2ff;
+      padding-left: 5px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 5px 0;
+      user-select: none;
+    }
+
+    .section-header h4 {
+      margin: 0;
+      color: #555;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .section-content {
+      padding-left: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .section-header:hover {
+      background-color: #f8f9fa;
+    }
+
+    .toggle-btn:hover {
+      color: #333;
     }
   </style>
 </head>
@@ -233,46 +301,121 @@
     let totalCount = 0;
     let filteredCount = 0;
     
-    // Track all open windows
     const openWindows = new Set();
     
-    // Create a new usage window
     function createUsageWindow(methodName) {
       const method = methodData[methodName];
       if (!method) return;
-      
-      // Create window element
-      const windowId = 'window-' + Date.now();
+          
       const windowEl = document.createElement('div');
+      const windowId = 'window-' + Date.now();
+
       windowEl.className = 'usage-window';
       windowEl.id = windowId;
       
-      // Position new window offset from others
-      const offset = openWindows.size * 30;
-      windowEl.style.top = `${20 + offset}px`;
+      const header = document.createElement('div');
+      header.className = 'window-header';
       
-      // Create window content
-      windowEl.innerHTML = `
-        <div class="window-header">
-          <span class="window-title">Usages of ${methodName}</span>
-          <span class="window-close">&times;</span>
-        </div>
-        <div class="window-body">
-          ${method.MonoUsages && method.MonoUsages.length > 0 
-            ? method.MonoUsages.map(usage => `<div class="usage-item">${usage}</div>`).join('')
-            : '<div class="no-usages">No Mono usages found for this method</div>'}
-        </div>
-      `;
+      const title = document.createElement('span');
+      title.className = 'window-title';
+      title.textContent = `Usages of: ${methodName}`;
       
-      // Add to DOM
+      const closeBtn = document.createElement('span');
+      closeBtn.className = 'window-close';
+      closeBtn.textContent = '×';
+      
+      header.append(title, closeBtn);
+      windowEl.append(header);
+      
+      const body = document.createElement('div');
+      body.className = 'window-body';
+      
+      const monoSection = createUsageSection(
+        'Mono Usages', 
+        method.MonoUsages, 
+        method.XrefUsages,
+        'mono-only'
+      );
+      body.append(monoSection);
+      
+      const xrefSection = createUsageSection(
+        'Xref Usages',
+        method.XrefUsages,
+        method.MonoUsages,
+        'xref-only'
+      );
+      body.append(xrefSection);
+      
+      windowEl.append(body);
+
+      function createUsageSection(title, items, compareItems, diffClass) {
+        const section = document.createElement('div');
+        section.className = 'usage-section';
+        
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        header.dataset.section = title.toLowerCase().replace(' ', '-');
+        
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = 'toggle-btn';
+        toggleBtn.textContent = '▼';
+        
+        const titleEl = document.createElement('h4');
+        titleEl.textContent = `${title} (${items?.length || 0})`;
+        
+        header.append(toggleBtn, titleEl);
+        section.append(header);
+        
+        const content = document.createElement('div');
+        content.className = `section-content ${header.dataset.section}-section`;
+        
+        if (!items || items.length === 0) {
+          const noItems = document.createElement('div');
+          noItems.className = 'no-usages';
+          noItems.textContent = `No ${title} found`;
+          content.append(noItems);
+        } else {
+          items.forEach(usage => {
+            const item = document.createElement('div');
+            item.className = 'usage-item';
+            if (compareItems && !compareItems.includes(usage)) {
+              item.classList.add(diffClass);
+            }
+            item.textContent = usage;
+            content.append(item);
+          });
+        }
+        
+        section.append(content);
+        return section;
+      }
+      
+      windowEl.querySelectorAll('.section-header').forEach(header => {
+        header.addEventListener('click', (e) => {
+          if (e.target.classList.contains('toggle-btn')) return;
+          
+          const btn = header.querySelector('.toggle-btn');
+          const section = header.nextElementSibling;
+          section.style.display = section.style.display === 'none' ? 'block' : 'none';
+          btn.textContent = section.style.display === 'none' ? '▶' : '▼';
+        });
+      });
+
+      windowEl.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const header = e.target.closest('.section-header');
+          const section = header.nextElementSibling;
+          section.style.display = section.style.display === 'none' ? 'block' : 'none';
+          btn.textContent = section.style.display === 'none' ? '▶' : '▼';
+        });
+      });
+      
       document.body.appendChild(windowEl);
       openWindows.add(windowId);
       
-      // Setup drag functionality
       setupWindowDrag(windowEl);
       
-      // Setup close button
-      const closeBtn = windowEl.querySelector('.window-close');
       closeBtn.addEventListener('click', () => {
         document.body.removeChild(windowEl);
         openWindows.delete(windowId);
@@ -281,7 +424,6 @@
       return windowEl;
     }
     
-    // Setup drag for a window
     function setupWindowDrag(windowEl) {
       const header = windowEl.querySelector('.window-header');
       let isDragging = false;
@@ -311,7 +453,6 @@
       });
     }
     
-    // Show usages in new window
     function showUsages(methodName) {
       createUsageWindow(methodName);
     }
@@ -323,9 +464,43 @@
 
     function highlightMatch(text, filter) {
       if (!filter) return text;
-      const escaped = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`(${escaped})`, 'gi');
-      return text.replace(regex, '<span class="highlight">$1</span>');
+      
+      const tempSpan = document.createElement('span');
+      tempSpan.innerText = text;
+      const escapedText = tempSpan.innerHTML;
+      
+      const fragment = document.createDocumentFragment();
+      const lowerText = escapedText.toLowerCase();
+      const lowerFilter = filter.toLowerCase();
+      
+      let lastIndex = 0;
+      let index = lowerText.indexOf(lowerFilter);
+      
+      while (index !== -1) {
+        if (index > lastIndex) {
+          const span = document.createElement('span');
+          span.innerHTML = escapedText.substring(lastIndex, index);
+          fragment.appendChild(span);
+        }
+        
+        const highlight = document.createElement('span');
+        highlight.className = 'highlight';
+        highlight.innerHTML = escapedText.substring(index, index + filter.length);
+        fragment.appendChild(highlight);
+        
+        lastIndex = index + filter.length;
+        index = lowerText.indexOf(lowerFilter, lastIndex);
+      }
+      
+      if (lastIndex < escapedText.length) {
+        const span = document.createElement('span');
+        span.innerHTML = escapedText.substring(lastIndex);
+        fragment.appendChild(span);
+      }
+      
+      const container = document.createElement('div');
+      container.appendChild(fragment);
+      return container.innerHTML;
     }
 
     function renderTable(filter = "", returnTypeFilter = "", tagFilter = "", typeFilter = "") {
@@ -371,7 +546,6 @@
           return { method, ReturnType, MonoCount, XrefCount, type, tag, tagClass, rank };
         }).filter(Boolean);
 
-        // Update total count (only once when data loads)
         if (totalCount === 0) {
           totalCount = entries.length;
         }
@@ -388,7 +562,6 @@
 
         filteredCount = filteredEntries.length;
 
-        // Sort the filtered entries
         filteredEntries.sort((a, b) => {
           if (a.rank !== b.rank) return a.rank - b.rank;
           if (sortField) {
@@ -404,24 +577,52 @@
         const fragment = document.createDocumentFragment();
         for (const entry of filteredEntries) {
           const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${highlightMatch(entry.method, filter)}</td>
-            <td>${highlightMatch(entry.ReturnType, returnTypeFilter)}</td>
-            <td>${entry.MonoCount}</td>
-            <td>${entry.XrefCount}</td>
-            <td>${entry.type}</td>
-            <td><span class="tag ${entry.tagClass}">${entry.tag}</span></td>
-          `;
+
+          const methodCell = document.createElement("td");
+          methodCell.innerText = entry.method;
+          if (filter) {
+            methodCell.innerHTML = highlightMatch(entry.method, filter);
+          }
+          
+          const returnTypeCell = document.createElement("td");
+          returnTypeCell.innerText = entry.ReturnType;
+          if (returnTypeFilter) {
+            returnTypeCell.innerHTML = highlightMatch(entry.ReturnType, returnTypeFilter);
+          }
+          
+          const monoCountCell = document.createElement("td");
+          monoCountCell.innerText = entry.MonoCount;
+          
+          const xrefCountCell = document.createElement("td");
+          xrefCountCell.innerText = entry.XrefCount;
+          
+          const typeCell = document.createElement("td");
+          typeCell.innerText = entry.type;
+          
+          const tagCell = document.createElement("td");
+          const tagSpan = document.createElement("span");
+          tagSpan.className = `tag ${entry.tagClass}`;
+          tagSpan.innerText = entry.tag;
+          tagCell.appendChild(tagSpan);
+          
+          row.append(
+            methodCell,
+            returnTypeCell,
+            monoCountCell,
+            xrefCountCell,
+            typeCell,
+            tagCell
+          );
+          
+          row.addEventListener('click', () => showUsages(entry.method));
           fragment.appendChild(row);
         }
         tbody.appendChild(fragment);
         
-        // Update the count display
         updateCountDisplay();
       });
     }
 
-    // Debounce function to limit how often a function is called
     function debounce(func, wait) {
       let timeout;
       return function(...args) {
@@ -431,18 +632,7 @@
       };
     }
 
-    // Create a debounced version of renderTable
     const debouncedRenderTable = debounce(renderTable, 300);
-
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelector('#methodsTable tbody').addEventListener('click', (e) => {
-        const row = e.target.closest('tr');
-        if (row) {
-          const methodName = row.cells[0].textContent.trim();
-          showUsages(methodName);
-        }
-      });
-    });
 
     document.getElementById("fileInput").addEventListener("change", function (event) {
       const file = event.target.files[0];
@@ -452,7 +642,7 @@
       reader.onload = function (e) {
         try {
           methodData = JSON.parse(e.target.result);
-          totalCount = 0; // Reset total count when new data loads
+          totalCount = 0;
           renderTable();
         } catch (err) {
           alert("Invalid JSON file");
@@ -488,8 +678,6 @@
       );
     });
 
-    // Update all other renderTable calls to include the returnTypeFilter parameter
-    // For example, in your existing searchInput listener:
     document.getElementById("searchInput").addEventListener("input", function (e) {
       debouncedRenderTable(
         e.target.value,
