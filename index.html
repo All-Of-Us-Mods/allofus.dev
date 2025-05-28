@@ -34,6 +34,7 @@
         h2 {
             font-size: 24px;
             margin-bottom: 10px;
+            margin-top: 0px;
         }
         
         p {
@@ -53,9 +54,14 @@
             background-color: #23232D;
             color: #ffffff;
             padding: 10px;
-            margin-bottom: 10px;
             border-radius: 10px;
-            max-width: 200px;
+            max-width: 300px;
+            transition: background-color 0.3s ease;
+        }
+
+        .card:hover {
+            background-color: #2A2A36;
+            cursor: help;
         }
         
         .card h3 {
@@ -63,16 +69,28 @@
             margin-bottom: 5px;
             margin-top: 0;
         }
-        
-        .card p {
-            margin-bottom: 5px;
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
-        .card-container {
-            display: flexbox;
-            margin: 0 auto;
-            max-width: 480px;
+        .col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
+            align-items: center;
+        }
+
+        iframe, .card {
+            transition: transform 0.3s;
+        }
+
+        iframe:hover, .card:hover {
+            transform: scale(1.05);
         }
     </style>
 </head>
@@ -80,22 +98,28 @@
     <div class="container">
         <h1>All Of Us Mods</h1>
 
-        <div class="card-container">
-            <h2>Our Products</h2>
-            <div class="card">
-                <h3>Mira API</h3>
-                <p>A comprehensive yet easy to use Among Us Modding API.</p>
-                <a href="https://github.com/All-Of-Us-Mods/MiraAPI">Learn More</a>
+        <div class="row">
+            <div class="col">
+                <h2>Our Products</h2>
+                <div class="card">
+                    <h3>Mira API</h3>
+                    <p>A comprehensive yet easy to use Among Us Modding API.</p>
+                    <a href="https://github.com/All-Of-Us-Mods/MiraAPI">Learn More</a>
+                </div>
+                <div class="card">
+                    <h3>Launchpad Reloaded</h3>
+                    <p>A vanilla-oriented Among Us mod with unique features.</p>
+                    <a href="https://github.com/All-Of-Us-Mods/LaunchpadReloaded">Learn More</a>
+                </div>
+                <div class="card">
+                    <h3>Starlight</h3>
+                    <p>An innovative Among Us mod launcher for Android.</p>
+                    <a href="https://discord.gg/FYYqJU2bvp">Learn More in our Discord</a>
+                </div>
             </div>
-            <div class="card">
-                <h3>Launchpad Reloaded</h3>
-                <p>A vanilla-oriented Among Us mod with unique features.</p>
-                <a href="https://github.com/All-Of-Us-Mods/LaunchpadReloaded">Learn More</a>
-            </div>
-            <div class="card">
-                <h3>Starlight</h3>
-                <p>An innovative Among Us mod launcher for Android.</p>
-                <a href="https://discord.gg/FYYqJU2bvp">Learn More in our Discord</a>
+            <div class="col">
+                <h2>Our Community</h2>
+                <iframe src="https://discord.com/widget?id=1333104345906020402&theme=dark" width="350" style="flex-grow:1;" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>    
             </div>
         </div>
         <p>Thank you for visiting All Of Us Mods. Stay tuned for more exciting updates!</p>
