@@ -13,13 +13,6 @@
     h1 {
       margin-bottom: 10px;
     }
-    #searchInput, #tagFilter, #typeFilter {
-      margin-bottom: 10px;
-      padding: 6px 10px;
-      width: 100%;
-      box-sizing: border-box;
-      flex: 1;
-    }
     .table-container {
       width: 100%;
       max-height: 65vh; /* Adjust this value as needed */
@@ -66,8 +59,8 @@
     th:nth-child(2) { width: 15%; }
     th:nth-child(3) { width: 7%; }
     th:nth-child(4) { width: 7%; }
-    th:nth-child(5) { width: 8%; }
-    th:nth-child(6) { width: 8%; }
+    th:nth-child(5) { width: 5%; }
+    th:nth-child(6) { width: 11%; }
 
     .tag {
       padding: 2px 6px;
@@ -95,11 +88,19 @@
     .highlight {
       background-color: yellow;
       font-weight: bold;
+    }.filters {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+      flex-wrap: wrap; /* Allow wrapping on small screens */
     }
-    .filters {
-        display: flex;
-        gap: 10px;
-        margin: 10px 0;
+
+    #searchInput, #returnTypeInput, #tagFilter, #typeFilter {
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      box-sizing: border-box;
+      flex: 1;
+      min-width: 150px; /* Prevent inputs from getting too narrow */
     }
     #searchInput {
       flex: 4;
@@ -114,22 +115,28 @@
       border-radius: 4px;
       display: inline-block;
     }
-    .usages-panel {
+
+
+    .usage-window {
       position: fixed;
-      right: 20px;
-      top: 20px;
       width: 500px;
-      max-height: 80vh;
+      max-height: 60vh;
       background-color: white;
       border: 1px solid #ddd;
       border-radius: 4px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      display: none;
+      display: flex;
       flex-direction: column;
       z-index: 100;
+      right: 20px;
+      top: 20px;
     }
     
-    .usages-header {
+    .usage-window:not(:first-of-type) {
+      margin-top: 30px; /* Stagger new windows */
+    }
+    
+    .window-header {
       background-color: #f0f0f0;
       padding: 10px 15px;
       cursor: move;
@@ -140,17 +147,17 @@
       align-items: center;
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
-      word-break: break-all;
+      word-break: break-word;
       white-space: pre-wrap;
     }
     
-    .usages-close {
+    .window-close {
       cursor: pointer;
       font-size: 18px;
       line-height: 1;
     }
     
-    .usages-body {
+    .window-body {
       padding: 15px;
       overflow-y: auto;
       flex-grow: 1;
@@ -187,6 +194,7 @@
   <input type="file" id="fileInput" accept="application/json" />
   <div class="filters">
     <input type="text" id="searchInput" placeholder="Search methods..." />
+    <input type="text" id="returnTypeInput" placeholder="Search return types..." />
     <select id="tagFilter">
       <option value="">All Tags</option>
       <option value="inlined">Potentially Inlined</option>
@@ -217,16 +225,6 @@
     </table>
   </div>
 
-  <div class="usages-panel" id="usagesPanel">
-    <div class="usages-header" id="usagesHeader">
-      <span id="usagesTitle">Mono Usages</span>
-      <span class="usages-close" id="usagesClose">&times;</span>
-    </div>
-    <div class="usages-body" id="usagesBody">
-      <!-- Content will be inserted here -->
-    </div>
-  </div>
-
   <script> 
     let methodData = {};
     let sortField = null;
@@ -235,11 +233,89 @@
     let totalCount = 0;
     let filteredCount = 0;
     
-    // Variables for draggable panel
-    let isDragging = false;
-    let offsetX, offsetY;
-    const usagesPanel = document.getElementById('usagesPanel');
-    const usagesHeader = document.getElementById('usagesHeader');
+    // Track all open windows
+    const openWindows = new Set();
+    
+    // Create a new usage window
+    function createUsageWindow(methodName) {
+      const method = methodData[methodName];
+      if (!method) return;
+      
+      // Create window element
+      const windowId = 'window-' + Date.now();
+      const windowEl = document.createElement('div');
+      windowEl.className = 'usage-window';
+      windowEl.id = windowId;
+      
+      // Position new window offset from others
+      const offset = openWindows.size * 30;
+      windowEl.style.top = `${20 + offset}px`;
+      
+      // Create window content
+      windowEl.innerHTML = `
+        <div class="window-header">
+          <span class="window-title">Usages of ${methodName}</span>
+          <span class="window-close">&times;</span>
+        </div>
+        <div class="window-body">
+          ${method.MonoUsages && method.MonoUsages.length > 0 
+            ? method.MonoUsages.map(usage => `<div class="usage-item">${usage}</div>`).join('')
+            : '<div class="no-usages">No Mono usages found for this method</div>'}
+        </div>
+      `;
+      
+      // Add to DOM
+      document.body.appendChild(windowEl);
+      openWindows.add(windowId);
+      
+      // Setup drag functionality
+      setupWindowDrag(windowEl);
+      
+      // Setup close button
+      const closeBtn = windowEl.querySelector('.window-close');
+      closeBtn.addEventListener('click', () => {
+        document.body.removeChild(windowEl);
+        openWindows.delete(windowId);
+      });
+      
+      return windowEl;
+    }
+    
+    // Setup drag for a window
+    function setupWindowDrag(windowEl) {
+      const header = windowEl.querySelector('.window-header');
+      let isDragging = false;
+      let offsetX, offsetY;
+      
+      header.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('window-close')) return;
+        
+        isDragging = true;
+        offsetX = e.clientX - windowEl.getBoundingClientRect().left;
+        offsetY = e.clientY - windowEl.getBoundingClientRect().top;
+        windowEl.style.cursor = 'grabbing';
+        e.preventDefault();
+      });
+      
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        windowEl.style.left = `${e.clientX - offsetX}px`;
+        windowEl.style.top = `${e.clientY - offsetY}px`;
+        windowEl.style.right = 'auto';
+      });
+      
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        windowEl.style.cursor = '';
+      });
+    }
+    
+    // Show usages in new window
+    function showUsages(methodName) {
+      createUsageWindow(methodName);
+    }
+
 
     function updateCountDisplay() {
       document.getElementById("countDisplay").textContent = `${filteredCount}/${totalCount}`;
@@ -252,7 +328,7 @@
       return text.replace(regex, '<span class="highlight">$1</span>');
     }
 
-    function renderTable(filter = "", tagFilter = "", typeFilter = "") {
+    function renderTable(filter = "", returnTypeFilter = "", tagFilter = "", typeFilter = "") {
       requestAnimationFrame(() => {
         const tbody = document.querySelector("#methodsTable tbody");
         tbody.innerHTML = "";
@@ -279,12 +355,14 @@
           let rank = 2;
           const lowerMethod = method.toLowerCase();
           const lowerFilter = filter.toLowerCase();
+          const lowerReturnType = ReturnType?.toLowerCase() || '';
+          const lowerReturnTypeFilter = returnTypeFilter.toLowerCase();
 
-          if (!filter) {
+          if (!filter && !returnTypeFilter) {
             rank = -1;
-          } else if (lowerMethod === lowerFilter) {
+          } else if (lowerMethod === lowerFilter || lowerReturnType === lowerReturnTypeFilter) {
             rank = 0;
-          } else if (lowerMethod.includes(lowerFilter)) {
+          } else if (lowerMethod.includes(lowerFilter) || lowerReturnType.includes(lowerReturnTypeFilter)) {
             rank = 1;
           } else {
             return null;
@@ -297,12 +375,15 @@
         if (totalCount === 0) {
           totalCount = entries.length;
         }
-
-        // Filter entries based on tag and type
+        
         let filteredEntries = entries.filter(entry => {
+          const methodMatch = !filter || entry.method.toLowerCase().includes(filter.toLowerCase());
+          const returnTypeMatch = !returnTypeFilter || 
+                                (entry.ReturnType && entry.ReturnType.toLowerCase().includes(returnTypeFilter.toLowerCase()));
           const tagMatch = !tagFilter || entry.tagClass === tagFilter;
           const typeMatch = !typeFilter || entry.type === typeFilter;
-          return tagMatch && typeMatch;
+          
+          return methodMatch && returnTypeMatch && tagMatch && typeMatch;
         });
 
         filteredCount = filteredEntries.length;
@@ -325,7 +406,7 @@
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${highlightMatch(entry.method, filter)}</td>
-            <td>${entry.ReturnType}</td>
+            <td>${highlightMatch(entry.ReturnType, returnTypeFilter)}</td>
             <td>${entry.MonoCount}</td>
             <td>${entry.XrefCount}</td>
             <td>${entry.type}</td>
@@ -349,68 +430,11 @@
         timeout = setTimeout(() => func.apply(context, args), wait);
       };
     }
-    function initPanelDrag() {
-      usagesHeader.addEventListener('mousedown', (e) => {
-        if (e.target.classList.contains('usages-close')) return;
-        
-        isDragging = true;
-        offsetX = e.clientX - usagesPanel.getBoundingClientRect().left;
-        offsetY = e.clientY - usagesPanel.getBoundingClientRect().top;
-        usagesPanel.style.cursor = 'grabbing';
-        e.preventDefault(); // Prevent text selection while dragging
-      });
-      
-      document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        
-        usagesPanel.style.left = `${e.clientX - offsetX}px`;
-        usagesPanel.style.top = `${e.clientY - offsetY}px`;
-        usagesPanel.style.right = 'auto';
-      });
-      
-      document.addEventListener('mouseup', () => {
-        isDragging = false;
-        usagesPanel.style.cursor = '';
-      });
-      
-      document.getElementById('usagesClose').addEventListener('click', () => {
-        usagesPanel.style.display = 'none';
-      });
-    }
-    
-    // Show usages in panel
-    function showUsages(methodName) {
-      const method = methodData[methodName];
-      if (!method) return;
-      
-      document.getElementById('usagesTitle').textContent = `Usages of: ${methodName}`;
-      const usagesBody = document.getElementById('usagesBody');
-      
-      if (method.MonoUsages && method.MonoUsages.length > 0) {
-        usagesBody.innerHTML = method.MonoUsages.map(usage => 
-          `<div class="usage-item">${usage}</div>`
-        ).join('');
-      } else {
-        usagesBody.innerHTML = '<div class="no-usages">No Mono usages found for this method</div>';
-      }
-      
-      // Show panel if hidden
-      if (usagesPanel.style.display !== 'flex') {
-        usagesPanel.style.display = 'flex';
-        // Reset position if not already positioned
-        if (!usagesPanel.style.left && !usagesPanel.style.top) {
-          usagesPanel.style.right = '20px';
-          usagesPanel.style.top = '20px';
-        }
-      }
-    }
 
     // Create a debounced version of renderTable
     const debouncedRenderTable = debounce(renderTable, 300);
+
     document.addEventListener('DOMContentLoaded', () => {
-      initPanelDrag();
-      
-      // Add click handler to table rows
       document.querySelector('#methodsTable tbody').addEventListener('click', (e) => {
         const row = e.target.closest('tr');
         if (row) {
@@ -455,11 +479,22 @@
       reader.readAsText(file);
     });
 
-    document.getElementById("searchInput").addEventListener("input", function (e) {
-      // Use the debounced version instead of calling renderTable directly
+    document.getElementById("returnTypeInput").addEventListener("input", function (e) {
       debouncedRenderTable(
-        e.target.value, 
-        document.getElementById("tagFilter").value, 
+        document.getElementById("searchInput").value,
+        e.target.value,
+        document.getElementById("tagFilter").value,
+        document.getElementById("typeFilter").value
+      );
+    });
+
+    // Update all other renderTable calls to include the returnTypeFilter parameter
+    // For example, in your existing searchInput listener:
+    document.getElementById("searchInput").addEventListener("input", function (e) {
+      debouncedRenderTable(
+        e.target.value,
+        document.getElementById("returnTypeInput").value,
+        document.getElementById("tagFilter").value,
         document.getElementById("typeFilter").value
       );
     });
@@ -467,6 +502,7 @@
     document.getElementById("tagFilter").addEventListener("change", function (e) {
       renderTable(
         document.getElementById("searchInput").value, 
+        document.getElementById("returnTypeInput").value,
         e.target.value, 
         document.getElementById("typeFilter").value
       );
@@ -475,6 +511,7 @@
     document.getElementById("typeFilter").addEventListener("change", function (e) {
       renderTable(
         document.getElementById("searchInput").value, 
+        document.getElementById("returnTypeInput").value,
         document.getElementById("tagFilter").value, 
         e.target.value
       );
