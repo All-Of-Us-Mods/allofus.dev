@@ -114,6 +114,70 @@
       border-radius: 4px;
       display: inline-block;
     }
+    .usages-panel {
+      position: fixed;
+      right: 20px;
+      top: 20px;
+      width: 400px;
+      max-height: 80vh;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: none;
+      flex-direction: column;
+      z-index: 100;
+    }
+    
+    .usages-header {
+      background-color: #f0f0f0;
+      padding: 10px 15px;
+      cursor: move;
+      border-bottom: 1px solid #ddd;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+    
+    .usages-close {
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+    }
+    
+    .usages-body {
+      padding: 15px;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+    
+    .usage-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      font-family: monospace;
+      font-size: 13px;
+    }
+    
+    .usage-item:last-child {
+      border-bottom: none;
+    }
+    
+    .no-usages {
+      color: #666;
+      font-style: italic;
+    }
+    
+    /* Make table rows clickable */
+    #methodsTable tbody tr {
+      cursor: pointer;
+    }
+    
+    #methodsTable tbody tr:hover {
+      background-color: #f5f5f5;
+    }
   </style>
 </head>
 <body>
@@ -151,12 +215,29 @@
     </table>
   </div>
 
-  <script> let methodData = {};
+  <div class="usages-panel" id="usagesPanel">
+    <div class="usages-header" id="usagesHeader">
+      <span id="usagesTitle">Mono Usages</span>
+      <span class="usages-close" id="usagesClose">&times;</span>
+    </div>
+    <div class="usages-body" id="usagesBody">
+      <!-- Content will be inserted here -->
+    </div>
+  </div>
+
+  <script> 
+    let methodData = {};
     let sortField = null;
     let sortAsc = true;
     let searchTimeout = null;
     let totalCount = 0;
     let filteredCount = 0;
+    
+    // Variables for draggable panel
+    let isDragging = false;
+    let offsetX, offsetY;
+    const usagesPanel = document.getElementById('usagesPanel');
+    const usagesHeader = document.getElementById('usagesHeader');
 
     function updateCountDisplay() {
       document.getElementById("countDisplay").textContent = `${filteredCount}/${totalCount}`;
@@ -266,9 +347,76 @@
         timeout = setTimeout(() => func.apply(context, args), wait);
       };
     }
+    function initPanelDrag() {
+      usagesHeader.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('usages-close')) return;
+        
+        isDragging = true;
+        offsetX = e.clientX - usagesPanel.getBoundingClientRect().left;
+        offsetY = e.clientY - usagesPanel.getBoundingClientRect().top;
+        usagesPanel.style.cursor = 'grabbing';
+        e.preventDefault(); // Prevent text selection while dragging
+      });
+      
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        usagesPanel.style.left = `${e.clientX - offsetX}px`;
+        usagesPanel.style.top = `${e.clientY - offsetY}px`;
+        usagesPanel.style.right = 'auto';
+      });
+      
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        usagesPanel.style.cursor = '';
+      });
+      
+      document.getElementById('usagesClose').addEventListener('click', () => {
+        usagesPanel.style.display = 'none';
+      });
+    }
+    
+    // Show usages in panel
+    function showUsages(methodName) {
+      const method = methodData[methodName];
+      if (!method) return;
+      
+      document.getElementById('usagesTitle').textContent = `Usages of: ${methodName}`;
+      const usagesBody = document.getElementById('usagesBody');
+      
+      if (method.MonoUsages && method.MonoUsages.length > 0) {
+        usagesBody.innerHTML = method.MonoUsages.map(usage => 
+          `<div class="usage-item">${usage}</div>`
+        ).join('');
+      } else {
+        usagesBody.innerHTML = '<div class="no-usages">No Mono usages found for this method</div>';
+      }
+      
+      // Show panel if hidden
+      if (usagesPanel.style.display !== 'flex') {
+        usagesPanel.style.display = 'flex';
+        // Reset position if not already positioned
+        if (!usagesPanel.style.left && !usagesPanel.style.top) {
+          usagesPanel.style.right = '20px';
+          usagesPanel.style.top = '20px';
+        }
+      }
+    }
 
     // Create a debounced version of renderTable
     const debouncedRenderTable = debounce(renderTable, 300);
+    document.addEventListener('DOMContentLoaded', () => {
+      initPanelDrag();
+      
+      // Add click handler to table rows
+      document.querySelector('#methodsTable tbody').addEventListener('click', (e) => {
+        const row = e.target.closest('tr');
+        if (row) {
+          const methodName = row.cells[0].textContent.trim();
+          showUsages(methodName);
+        }
+      });
+    });
 
     document.getElementById("fileInput").addEventListener("change", function (event) {
       const file = event.target.files[0];
