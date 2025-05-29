@@ -306,6 +306,15 @@
       border-right: 1px solid #ddd;
       word-break: break-word;
       white-space: pre-wrap;
+      cursor: pointer;
+    }
+
+    .virtual-header .cell.sort-asc::before {
+      content: "▲";
+    }
+
+    .virtual-header .cell.sort-desc::before {
+      content: "▼";
     }
 
     .virtual-viewport {
@@ -851,6 +860,16 @@
           sortField = field;
           sortAsc = true;
         }
+        
+
+        // Clear all arrows
+        document.querySelectorAll(".virtual-header .cell").forEach(cell => {
+          cell.classList.remove("sort-asc", "sort-desc");
+        });
+
+        // Add arrow to selected header
+        th.classList.add(sortAsc ? "sort-asc" : "sort-desc");
+
         renderVirtualTable();
       });
     });
