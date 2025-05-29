@@ -69,26 +69,33 @@
       font-weight: bold;
       display: inline-block;
     }
+
     .inlined {
       background-color: #d1e7dd;
       color: #0f5132;
     }
+
     .used-by-inline {
       background-color: #f8d7da;
       color: #842029;
     }
+
     .stripped {
       background-color: #e2e3e5;
       color: #41464b;
     }
+
     .matched {
       background-color: #cfe2ff;
       color: #084298;
     }
+
     .highlight {
       background-color: yellow;
       font-weight: bold;
-    }.filters {
+    }
+    
+    .filters {
       display: flex;
       gap: 10px;
       margin: 10px 0;
@@ -130,8 +137,27 @@
       z-index: 100;
       right: 20px;
       top: 20px;
+      resize: both;
+      overflow: hidden;
+      min-width: 300px;
+      min-height: 200px;
     }
-    
+
+    .usage-window::-webkit-resizer {
+      display: none;
+    }
+
+    .resize-handle {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 15px;
+      height: 15px;
+      background: linear-gradient(135deg, #ddd 0%, #ddd 50%, transparent 50%);
+      cursor: nwse-resize;
+      z-index: 10;
+    }
+
     .usage-window:not(:first-of-type) {
       margin-top: 30px;
     }
@@ -164,10 +190,12 @@
     }
     
     .usage-item {
-      padding: 8px 0;
+      padding: 8px 12px;
       border-bottom: 1px solid #eee;
       font-family: monospace;
       font-size: 13px;
+      display: flex;
+      align-items: center;
     }
     
     .usage-item:last-child {
@@ -178,7 +206,49 @@
       color: #666;
       font-style: italic;
     }
-    
+
+    .copy-btn {
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #555;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      padding: 0;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+
+    .copy-btn:active {
+      background-color: #d0d0d0;
+    }
+
+    .copy-btn::before {
+      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'%3E%3C/path%3E%3C/svg%3E");
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .copy-btn.copy-flash::before {
+      content: "✓";
+      color: green;
+    }
+
+    .copy-btn.copy-error::before {
+      content: "✗";
+      color: red;
+    }
+
     #methodsTable tbody tr {
       cursor: pointer;
     }
@@ -255,6 +325,15 @@
     .toggle-btn:hover {
       color: #333;
     }
+  
+    @keyframes copyFlash {
+      0% { color: green; }
+      100% { color: #666; }
+    }
+
+    .copy-flash {
+      animation: copyFlash 1s;
+    }
   </style>
 </head>
 <body>
@@ -302,7 +381,25 @@
     let filteredCount = 0;
     
     const openWindows = new Set();
-    
+
+    function setupCopyButton(button, textToCopy) {
+      button.addEventListener('click', (e) => {
+          e.stopPropagation();
+          navigator.clipboard.writeText(textToCopy).then(() => {
+              button.classList.add('copy-flash');
+              setTimeout(() => {
+                  button.classList.remove('copy-flash');
+              }, 1000);
+          }).catch(err => {
+              button.classList.add('copy-error');
+              setTimeout(() => {
+                  button.classList.remove('copy-error');
+              }, 1000);
+              console.error('Failed to copy:', err);
+          });
+      });
+    }
+
     function createUsageWindow(methodName) {
       const method = methodData[methodName];
       if (!method) return;
@@ -348,6 +445,10 @@
       
       windowEl.append(body);
 
+      const resizeHandle = document.createElement('div');
+      resizeHandle.className = 'resize-handle';
+      windowEl.appendChild(resizeHandle);
+
       function createUsageSection(title, items, compareItems, diffClass) {
         const section = document.createElement('div');
         section.className = 'usage-section';
@@ -370,25 +471,43 @@
         content.className = `section-content ${header.dataset.section}-section`;
         
         if (!items || items.length === 0) {
-          const noItems = document.createElement('div');
-          noItems.className = 'no-usages';
-          noItems.textContent = `No ${title} found`;
-          content.append(noItems);
+            const noItems = document.createElement('div');
+            noItems.className = 'no-usages';
+            noItems.textContent = `No ${title} found`;
+            content.append(noItems);
         } else {
           items.forEach(usage => {
             const item = document.createElement('div');
             item.className = 'usage-item';
+            
+            // Create copy button (now on LEFT)
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.title = 'Copy to clipboard';
+            
+            // Create usage text element
+            const usageText = document.createElement('span');
+            usageText.textContent = usage;
+            usageText.style.flexGrow = '1'; // Take remaining space
+            
+            // Add elements to item (button first)
+            item.append(copyBtn, usageText);
+            
+            // Set up copy functionality
+            setupCopyButton(copyBtn, usage);
+            
+            // Add diff class if needed
             if (compareItems && !compareItems.includes(usage)) {
-              item.classList.add(diffClass);
+                item.classList.add(diffClass);
             }
-            item.textContent = usage;
+            
             content.append(item);
           });
         }
         
         section.append(content);
         return section;
-      }
+    }
       
       windowEl.querySelectorAll('.section-header').forEach(header => {
         header.addEventListener('click', (e) => {
@@ -415,6 +534,7 @@
       openWindows.add(windowId);
       
       setupWindowDrag(windowEl);
+      setupWindowResize(windowEl, resizeHandle);
       
       closeBtn.addEventListener('click', () => {
         document.body.removeChild(windowEl);
@@ -430,7 +550,10 @@
       let offsetX, offsetY;
       
       header.addEventListener('mousedown', (e) => {
-        if (e.target.classList.contains('window-close')) return;
+        if (e.target.classList.contains('window-close') || 
+            e.target.classList.contains('resize-handle')) {
+          return;
+        }
         
         isDragging = true;
         offsetX = e.clientX - windowEl.getBoundingClientRect().left;
@@ -453,6 +576,32 @@
       });
     }
     
+    function setupWindowResize(element, handle) {
+      let startX, startY, startWidth, startHeight;
+
+      function initResize(e) {
+        e.preventDefault();
+        startX = e.clientX;
+        startY = e.clientY;
+        startWidth = parseInt(document.defaultView.getComputedStyle(element).width, 10);
+        startHeight = parseInt(document.defaultView.getComputedStyle(element).height, 10);
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', stopResize);
+      }
+
+      function resize(e) {
+        element.style.width = (startWidth + e.clientX - startX) + 'px';
+        element.style.height = (startHeight + e.clientY - startY) + 'px';
+      }
+
+      function stopResize() {
+        document.removeEventListener('mousemove', resize);
+        document.removeEventListener('mouseup', stopResize);
+      }
+
+      handle.addEventListener('mousedown', initResize);
+    }
+
     function showUsages(methodName) {
       createUsageWindow(methodName);
     }
@@ -579,11 +728,26 @@
           const row = document.createElement("tr");
 
           const methodCell = document.createElement("td");
-          methodCell.innerText = entry.method;
+          const methodContainer = document.createElement("div");
+          methodContainer.style.display = "flex";
+          methodContainer.style.alignItems = "center";
+          
+          const copyBtn = document.createElement("button");
+          copyBtn.className = "copy-btn";
+          copyBtn.title = "Copy method name";
+          
+          const methodText = document.createElement("span");
           if (filter) {
-            methodCell.innerHTML = highlightMatch(entry.method, filter);
+            methodText.innerHTML = highlightMatch(entry.method, filter);
+          } else {
+            methodText.textContent = entry.method;
           }
           
+          methodContainer.append(copyBtn, methodText);
+          methodCell.append(methodContainer);
+          
+          setupCopyButton(copyBtn, entry.method);
+
           const returnTypeCell = document.createElement("td");
           returnTypeCell.innerText = entry.ReturnType;
           if (returnTypeFilter) {
