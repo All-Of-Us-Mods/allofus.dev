@@ -50,12 +50,13 @@
     
     .filters {
       display: flex;
+      align-items: center;
       gap: 0.625rem;
       margin: 0.625rem 0;
       flex-wrap: wrap;
     }
 
-    #searchInput, #returnTypeInput, #tagFilter, #typeFilter {
+    .filter-items {
       margin-bottom: 0.625rem;
       padding: 0.375rem 0.625rem;
       box-sizing: border-box;
@@ -370,16 +371,26 @@
     <button onclick="loadOnline()">Load Latest Online JSON</button>
   </div>
   <div class="filters">
-    <input type="text" id="searchInput" placeholder="Search methods..." />
-    <input type="text" id="returnTypeInput" placeholder="Search return types..." />
-    <select id="tagFilter">
+    <input class="filter-items" type="text" id="searchInput" placeholder="Search methods..." />
+    <input class="filter-items" type="text" id="returnTypeInput" placeholder="Search return types..." />
+    <div class="filter-items">
+      <input type="checkbox" id="showCompilerGenerated" checked />
+      <label for="showCompilerGenerated">Show Compiler Generated</label>
+    </div>
+    <div class="filter-items">
+      <input type="checkbox" id="generic" checked />
+      <label for="generic">Show Generic Methods</label>
+    </div>
+    <input class="filter-items" type="number" id="minMonoCount" placeholder="Min Mono Count" min="0" />
+    <input class="filter-items" type="number" id="minXrefCount" placeholder="Min Xref Count" min="0" />
+    <select class="filter-items" id="tagFilter">
       <option value="">All Tags</option>
       <option value="inlined">Potentially Inlined</option>
       <option value="used-by-inline">Potentially used by Inlined method</option>
       <option value="stripped">Potentially Stripped</option>
       <option value="matched">Matched</option>
     </select>
-    <select id="typeFilter">
+    <select class="filter-items" id="typeFilter">
       <option value="">All Types</option>
       <option value="Method">Method</option>
       <option value="Property">Property</option>
@@ -436,6 +447,8 @@
           ReturnType: data.ReturnType,
           MonoCount: data.MonoCount,
           XrefCount: data.XrefCount,
+          CompilerGenerated: data.IsCompilerGenerated,
+          Generic: data.IsGeneric,
           type: data.IsProperty ? "Property" : "Method",
           tag,
           tagClass
@@ -450,13 +463,23 @@
       const returnTypeFilter = document.getElementById("returnTypeInput").value.trim().toLowerCase();
       const tagFilter = document.getElementById("tagFilter").value;
       const typeFilter = document.getElementById("typeFilter").value;
+      const showCompilerGenerated = document.getElementById("showCompilerGenerated").checked;
+      const generic = document.getElementById("generic").checked;
+      const minMono = parseInt(document.getElementById("minMonoCount").value, 10) || 0;
+      const minXref = parseInt(document.getElementById("minXrefCount").value, 10) || 0;
+
 
       visibleEntries = allEntries.filter(entry => {
         const matchesMethod = !filter || entry.method.toLowerCase().includes(filter);
         const matchesReturn = !returnTypeFilter || (entry.ReturnType.toLowerCase().includes(returnTypeFilter));
         const matchesTag = !tagFilter || entry.tagClass === tagFilter;
         const matchesType = !typeFilter || entry.type === typeFilter;
-        return matchesMethod && matchesReturn && matchesTag && matchesType;
+        const matchesCompilerGenerated = showCompilerGenerated || !entry.CompilerGenerated;
+        const matchesGeneric = generic || !entry.Generic;
+        const matchesMonoCount = entry.MonoCount >= minMono;
+        const matchesXrefCount = entry.XrefCount >= minXref;
+        return matchesMethod && matchesReturn && matchesTag && matchesType && 
+        matchesCompilerGenerated && matchesGeneric && matchesMonoCount && matchesXrefCount;
       });
 
       if (sortField) {
@@ -844,10 +867,14 @@
       reader.readAsText(file);
     });
 
-    document.getElementById("searchInput").addEventListener("input", debounce(renderVirtualTable, 200));
-    document.getElementById("returnTypeInput").addEventListener("input", debounce(renderVirtualTable, 200));
+    document.getElementById("searchInput").addEventListener("input", renderVirtualTable);
+    document.getElementById("returnTypeInput").addEventListener("input", renderVirtualTable);
     document.getElementById("tagFilter").addEventListener("change", renderVirtualTable);
     document.getElementById("typeFilter").addEventListener("change", renderVirtualTable);
+    document.getElementById("showCompilerGenerated").addEventListener("change", renderVirtualTable);
+    document.getElementById("generic").addEventListener("change", renderVirtualTable);
+    document.getElementById("minMonoCount").addEventListener("input", renderVirtualTable);
+    document.getElementById("minXrefCount").addEventListener("input", renderVirtualTable);
 
     document.querySelectorAll(".virtual-header .cell").forEach(th => {
       th.addEventListener("click", () => {
