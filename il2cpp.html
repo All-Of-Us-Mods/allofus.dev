@@ -359,7 +359,10 @@
 </head>
 <body>
   <h1>IL2CPP Mono Methods Analyzer</h1>
-  <input type="file" id="fileInput" accept="application/json" />
+  <div class="upload-inputs">
+    <input type="file" id="fileInput" accept="application/json" />
+    <button onclick="loadOnline()">Load Latest Online JSON</button>
+  </div>
   <div class="filters">
     <input type="text" id="searchInput" placeholder="Search methods..." />
     <input type="text" id="returnTypeInput" placeholder="Search return types..." />
@@ -801,6 +804,19 @@
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(context, args), wait);
       };
+    }
+
+    function loadOnline() {
+      fetch("method_analysis_results.json")
+        .then(response => response.json())
+        .then(data => {
+          methodData = data;
+          updateDatasetFromJson();
+        })
+        .catch(err => {
+          alert("Failed to load online JSON");
+          console.error(err);
+        });
     }
 
     document.getElementById("fileInput").addEventListener("change", function (event) {
