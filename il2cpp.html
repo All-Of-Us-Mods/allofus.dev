@@ -269,11 +269,6 @@ h1 {
   padding-left: 5px;
 }
 
-.usage-item.common {
-  border-left: 3px solid #cfe2ff;
-  padding-left: 5px;
-}
-
 .section-header {
   display: flex;
   align-items: center;
@@ -692,6 +687,14 @@ function createUsageWindow(methodName) {
   
   const body = document.createElement('div');
   body.className = 'window-body';
+
+  const showDiffsToggle = document.createElement("button");
+  showDiffsToggle.className = "toggle-button";
+  showDiffsToggle.textContent = "Show Diffs Only";
+  showDiffsToggle.style.marginBottom = "0.75rem";
+  let showDiffsOnly = false;
+
+  body.prepend(showDiffsToggle);
   
   const monoSection = createUsageSection(
     'Mono Usages', 
@@ -708,6 +711,32 @@ function createUsageWindow(methodName) {
     'xref-only'
   );
   body.append(xrefSection);
+
+  showDiffsToggle.addEventListener("click", () => {
+    showDiffsOnly = !showDiffsOnly;
+    showDiffsToggle.classList.toggle("toggled", showDiffsOnly);
+    showDiffsToggle.textContent = showDiffsOnly ? "Showing Diffs Only" : "Show Diffs Only";
+
+    let monoCount = 0;
+    let xrefCount = 0;
+
+    windowEl.querySelectorAll(".usage-item").forEach(item => {
+      if (item.classList.contains('mono-only')) {
+        monoCount++;
+      } else if (item.classList.contains('xref-only')) {
+        xrefCount++;
+      }
+      item.style.display = showDiffsOnly ? (item.classList.contains('common') ? 'none' : '') : '';
+    });
+    if (showDiffsOnly) {  
+      monoSection.querySelector('.section-header h4').textContent = `Mono Usages (${monoCount} / ${method.MonoUsages.length})`;
+      xrefSection.querySelector('.section-header h4').textContent = `Xref Usages (${xrefCount} / ${method.XrefUsages.length})`;
+    } else {
+      monoSection.querySelector('.section-header h4').textContent = `Mono Usages (${method.MonoUsages.length})`;
+      xrefSection.querySelector('.section-header h4').textContent = `Xref Usages (${method.XrefUsages.length})`;
+    }
+  });
+
   
   windowEl.append(body);
 
@@ -775,7 +804,9 @@ function createUsageWindow(methodName) {
         setupCopyButton(copyBtn, usage);
         
         if (compareItems && !compareItems.includes(usage)) {
-            item.classList.add(diffClass);
+          item.classList.add(diffClass);
+        } else {
+            item.classList.add('common');
         }
         
         content.append(item);
