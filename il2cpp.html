@@ -30,7 +30,7 @@ h1 {
 
 .used-by-inline {
   background-color: #f8d7da;
-  color: #842029;
+  color: #856404;
 }
 
 .stripped {
@@ -46,6 +46,11 @@ h1 {
 .highlight {
   background-color: yellow;
   font-weight: bold;
+}
+
+.flagged {
+  background-color: #fff3cd;
+  color: #842029;
 }
 
 .filters {
@@ -481,6 +486,7 @@ h1 {
       <option value="used-by-inline">Potentially used by Inlined method</option>
       <option value="stripped">Potentially Stripped</option>
       <option value="matched">Matched</option>
+      <option value="flagged">Flagged</option>
     </select>
     <select class="filter-items" id="typeFilter">
       <option value="">All Types</option>
@@ -533,6 +539,9 @@ function updateDatasetFromJson() {
     } else if (data.XrefCount > data.MonoCount) {
       tag = "Potentially used by Inlined method";
       tagClass = "used-by-inline";
+    } else if (data.IsFlagged) {
+      tag = "Flagged";
+      tagClass = "flagged";
     }
     if (data.IsStripped) {
       tag = "Potentially Stripped";
