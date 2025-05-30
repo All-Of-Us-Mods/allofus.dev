@@ -218,6 +218,20 @@ h1 {
   color: red;
 }
 
+.link-btn {
+  margin-right: 0.5rem;
+  font-size: 14px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: #198754; /* match your green */
+  padding: 0;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
 .usage-section {
   margin-bottom: 1.25rem;
 }
@@ -504,6 +518,11 @@ let rowHeights = [];
 let totalHeight = 0;
 let scrollTop = 0;
 
+let currentZ = 500;
+function getNextZIndex() {
+  return ++currentZ;
+}
+
 function updateDatasetFromJson() {
   allEntries = Object.entries(methodData).map(([method, data]) => {
     let tag = "Matched";
@@ -631,7 +650,7 @@ function renderVisibleRows() {
     const copyBtn = row.querySelector(".copy-btn");
     setupCopyButton(copyBtn, entry.method);
 
-    row.addEventListener('click', () => showUsages(entry.method));
+    row.addEventListener('click', () => createUsageWindow(entry.method));
     content.appendChild(row);
 
     requestAnimationFrame(() => {
@@ -669,13 +688,27 @@ function setupCopyButton(button, textToCopy) {
 
 function createUsageWindow(methodName) {
   const method = methodData[methodName];
-  if (!method) return;
-      
+  if (!method) {
+    return;
+  }
+
+  const existing = document.querySelector(`.usage-window[data-method="${CSS.escape(methodName)}"]`);
+  if (existing) {
+    // Bring it to front
+    existing.style.zIndex = getNextZIndex();
+    return;
+  }
+
   const windowEl = document.createElement('div');
   const windowId = 'window-' + Date.now();
 
   windowEl.className = 'usage-window';
   windowEl.id = windowId;
+  windowEl.setAttribute("data-method", methodName);
+
+  windowEl.addEventListener("mousedown", () => {
+    windowEl.style.zIndex = getNextZIndex();
+  });
   
   const header = document.createElement('div');
   header.className = 'window-header';
@@ -800,15 +833,24 @@ function createUsageWindow(methodName) {
         const copyBtn = document.createElement('button');
         copyBtn.className = 'copy-btn';
         copyBtn.title = 'Copy to clipboard';
-        
+
+        const linkBtn = document.createElement('button');
+        linkBtn.className = 'link-btn';
+        linkBtn.title = 'Open usage window';
+        linkBtn.innerText = '🔗';
+
         const usageText = document.createElement('span');
         usageText.textContent = usage;
         usageText.style.flexGrow = '1';
-        
-        item.append(copyBtn, usageText);
+
+        item.append(copyBtn, linkBtn, usageText);
         
         setupCopyButton(copyBtn, usage);
-        
+        linkBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          createUsageWindow(usage);
+        });
+
         if (compareItems && !compareItems.includes(usage)) {
           item.classList.add(diffClass);
         } else {
@@ -843,6 +885,7 @@ function createUsageWindow(methodName) {
       btn.textContent = section.style.display === 'none' ? '▶' : '▼';
     });
   });
+
   
   document.body.appendChild(windowEl);
   openWindows.add(windowId);
@@ -927,10 +970,6 @@ function setupWindowResize(element, handle) {
   }
 
   handle.addEventListener('mousedown', initResize);
-}
-
-function showUsages(methodName) {
-  createUsageWindow(methodName);
 }
 
 function updateCountDisplay() {
