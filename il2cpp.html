@@ -5,363 +5,452 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IL2CPP Mono Method Analyzer</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 1.25rem;
-      background-color: #f4f4f4;
-    }
+body {
+  font-family: Arial, sans-serif;
+  padding: 1.25rem;
+  background-color: #f4f4f4;
+}
 
-    h1 {
-      margin-bottom: 0.625rem;
-    }
+h1 {
+  margin-bottom: 0.625rem;
+}
 
-    .tag {
-      padding: 0.125rem 0.375rem;
-      border-radius: 0.25rem;
-      font-size: 0.85em;
-      font-weight: bold;
-      display: inline-block;
-    }
+.tag {
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.85em;
+  font-weight: bold;
+  display: inline-block;
+}
 
-    .inlined {
-      background-color: #d1e7dd;
-      color: #0f5132;
-    }
+.inlined {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
 
-    .used-by-inline {
-      background-color: #f8d7da;
-      color: #842029;
-    }
+.used-by-inline {
+  background-color: #f8d7da;
+  color: #842029;
+}
 
-    .stripped {
-      background-color: #e2e3e5;
-      color: #41464b;
-    }
+.stripped {
+  background-color: #e2e3e5;
+  color: #41464b;
+}
 
-    .matched {
-      background-color: #cfe2ff;
-      color: #084298;
-    }
+.matched {
+  background-color: #cfe2ff;
+  color: #084298;
+}
 
-    .highlight {
-      background-color: yellow;
-      font-weight: bold;
-    }
-    
-    .filters {
-      display: flex;
-      align-items: center;
-      gap: 0.625rem;
-      margin: 0.625rem 0;
-      flex-wrap: wrap;
-    }
+.highlight {
+  background-color: yellow;
+  font-weight: bold;
+}
 
-    .filter-items {
-      margin-bottom: 0.625rem;
-      padding: 0.375rem 0.625rem;
-      box-sizing: border-box;
-      flex: 1;
-      min-width: 150px;
-    }
+.filters {
+  display: flex;
+  align-items: stretch;
+  gap: 0.625rem;
+  margin: 0.625rem 0;
+  flex-wrap: wrap;
+}
 
-    #searchInput {
-      flex: 4;
-    }
+.filter-items {
+  margin-bottom: 0.625rem;
+  padding: 0.375rem 0.625rem;
+  box-sizing: border-box;
+  flex: 1;
+  min-width: 150px;
+  font-size: 0.875rem;
+}
 
-    .count-display {
-      margin-top: 0.625rem;
-      font-size: 1.25rem; 
-      color: #222;
-      padding: 5px;
-      background-color: #f8f9fa;
-      border: 0.0625rem solid #dee2e6;
-      border-radius: 0.25rem;
-      display: inline-block;
-    }
+#searchInput {
+  flex: 5;
+}
 
-    .usage-window {
-      position: fixed;
-      width: 600px;
-      max-height: 60vh;
-      background-color: white;
-      border: 0.0625rem solid #ddd;
-      border-radius: 0.25rem;
-      box-shadow: 0 0.125rem 0.625rem rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      z-index: 100;
-      right: 1.25rem;
-      top: 1.25rem;
-      resize: both;
-      overflow: hidden;
-      min-width: 300px;
-      min-height: 200px;
-    }
+#returnTypeInput {
+  flex: 3;
+}
 
-    .usage-window::-webkit-resizer {
-      display: none;
-    }
+.count-display {
+  margin-top: 0.625rem;
+  font-size: 1.25rem; 
+  color: #222;
+  padding: 5px;
+  background-color: #f8f9fa;
+  border: 0.0625rem solid #dee2e6;
+  border-radius: 0.25rem;
+  display: inline-block;
+}
 
-    .resize-handle {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      width: 15px;
-      height: 15px;
-      background: linear-gradient(135deg, #ddd 0%, #ddd 50%, transparent 50%);
-      cursor: nwse-resize;
-      z-index: 10;
-    }
+.usage-window {
+  position: fixed;
+  width: 600px;
+  max-height: 60vh;
+  background-color: white;
+  border: 0.0625rem solid #ddd;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.125rem 0.625rem rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  right: 1.25rem;
+  top: 1.25rem;
+  resize: both;
+  overflow: hidden;
+  min-width: 300px;
+  min-height: 200px;
+}
 
-    .usage-window:not(:first-of-type) {
-      margin-top: 30px;
-    }
-    
-    .window-header {
-      background-color: #f0f0f0;
-      padding: 0.625rem 0.9375rem;
-      cursor: move;
-      border-bottom: 0.0625rem solid #ddd;
-      font-weight: bold;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top-left-radius: 0.25rem;
-      border-top-right-radius: 0.25rem;
-      word-break: break-word;
-      white-space: pre-wrap;
-    }
-    
-    .window-close {
-      cursor: pointer;
-      font-size: 2rem;
-      line-height: 1;
-    }
-    
-    .window-body {
-      padding: 0.9375rem;
-      overflow-y: auto;
-      flex-grow: 1;
-    }
-    
-    .usage-item {
-      padding: 0.5rem 0.75rem;
-      border-bottom: 0.0625rem solid #eee;
-      font-family: monospace;
-      font-size: .8rem;
-      display: flex;
-      align-items: center;
-    }
-    
-    .usage-item:last-child {
-      border-bottom: none;
-    }
-    
-    .no-usages {
-      color: #666;
-      font-style: italic;
-    }
+.usage-window::-webkit-resizer {
+  display: none;
+}
 
-    .copy-btn {
-      background-color: #f0f0f0;
-      border: 0.0625rem solid #ddd;
-      border-radius: 0.25rem;
-      cursor: pointer;
-      color: #555;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 0.5rem;
-      padding: 0;
-      transition: all 0.2s ease;
-      flex-shrink: 0;
-    }
+.resize-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 15px;
+  height: 15px;
+  background: linear-gradient(135deg, #ddd 0%, #ddd 50%, transparent 50%);
+  cursor: nwse-resize;
+  z-index: 10;
+}
 
-    .copy-btn:hover {
-      background-color: #e0e0e0;
-      color: #333;
-    }
+.usage-window:not(:first-of-type) {
+  margin-top: 30px;
+}
 
-    .copy-btn:active {
-      background-color: #d0d0d0;
-    }
+.window-header {
+  background-color: #f0f0f0;
+  padding: 0.625rem 0.9375rem;
+  cursor: move;
+  border-bottom: 0.0625rem solid #ddd;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
 
-    .copy-btn::before {
-      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'%3E%3C/path%3E%3C/svg%3E");
-      display: inline-block;
-      vertical-align: middle;
-    }
+.window-close {
+  cursor: pointer;
+  font-size: 2rem;
+  line-height: 1;
+}
 
-    .copy-btn.copy-flash::before {
-      content: "✓";
-      color: green;
-    }
+.window-body {
+  padding: 0.9375rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
 
-    .copy-btn.copy-error::before {
-      content: "✗";
-      color: red;
-    }
+.usage-item {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 0.0625rem solid #eee;
+  font-family: monospace;
+  font-size: .8rem;
+  display: flex;
+  align-items: center;
+  word-break: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 
-    .usage-section {
-      margin-bottom: 1.25rem;
-    }
+.usage-item span {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
 
-    .usage-section h4 {
-      margin: 0 0 0.5rem 0;
-      padding-bottom: 0.25rem;
-      border-bottom: 0.0625rem solid #eee;
-      color: #555;
-    }
+.usage-item:last-child {
+  border-bottom: none;
+}
 
-    .mono-only {
-      background-color: rgba(213, 245, 227, 0.3);
-      border-left: 3px solid #0f5132;
-      padding-left: 5px;
-    }
+.no-usages {
+  color: #666;
+  font-style: italic;
+}
 
-    .xref-only {
-      background-color: rgba(255, 231, 217, 0.3);
-      border-left: 3px solid #0f5132;
-      padding-left: 5px;
-    }
+.copy-btn {
+  background-color: #f0f0f0;
+  border: 0.0625rem solid #ddd;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  color: #555;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5rem;
+  padding: 0;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
 
-    .usage-item.common {
-      border-left: 3px solid #cfe2ff;
-      padding-left: 5px;
-    }
+.copy-btn:hover {
+  background-color: #e0e0e0;
+  color: #333;
+}
 
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      padding: 5px 0;
-      user-select: none;
-    }
+.copy-btn:active {
+  background-color: #d0d0d0;
+}
 
-    .section-header h4 {
-      margin: 0;
-      color: #555;
-    }
+.copy-btn::before {
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'%3E%3C/path%3E%3C/svg%3E");
+  display: inline-block;
+  vertical-align: middle;
+}
 
-    .toggle-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .75rem;
-      color: #666;
-    }
+.copy-btn.copy-flash::before {
+  content: "✓";
+  color: green;
+}
 
-    .section-content {
-      padding-left: 1.25rem;
-      transition: all 0.2s ease;
-    }
+.copy-btn.copy-error::before {
+  content: "✗";
+  color: red;
+}
 
-    .section-header:hover {
-      background-color: #f8f9fa;
-    }
+.usage-section {
+  margin-bottom: 1.25rem;
+}
 
-    .toggle-btn:hover {
-      color: #333;
-    }
-  
-    @keyframes copyFlash {
-      0% { color: green; }
-      100% { color: #666; }
-    }
+.usage-section h4 {
+  margin: 0 0 0.5rem 0;
+  padding-bottom: 0.25rem;
+  border-bottom: 0.0625rem solid #eee;
+  color: #555;
+}
 
-    .copy-flash {
-      animation: copyFlash 1s;
-    }
+/* at widths ≤ 768px, usage windows expand to cover the whole screen */
+@media (max-width: 768px) {
+  .usage-window {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    max-height: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    resize: none !important;
+    margin: 0 !important;
+    background-color: white;
+    z-index: 1000; /* above everything */
+  }
+  /* hide the resize handle on mobile */
+  .usage-window .resize-handle {
+    display: none !important;
+  }
+  /* optional: make header non-draggable */
+  .usage-window .window-header {
+    cursor: default !important;
+  }
+}
 
-    .virtual-table {
-      min-width: 1000px;
-      max-height: 65vh;
-      border: 0.0625rem solid #ddd;
-      background: white;
-      display: flex;
-      flex-direction: column;
-      font-size: .875rem;
-    }
+.mono-only {
+  background-color: rgba(213, 245, 227, 0.3);
+  border-left: 3px solid #0f5132;
+  padding-left: 5px;
+}
 
-    .virtual-header {
-      display: flex;
-      background: #f0f0f0;
-      font-weight: bold;
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      border-bottom: 0.0625rem solid #ddd;
-    }
+.xref-only {
+  background-color: rgba(255, 231, 217, 0.3);
+  border-left: 3px solid #0f5132;
+  padding-left: 5px;
+}
 
-    .virtual-header .cell.sort-asc::before {
-      content: "▲";
-    }
+.usage-item.common {
+  border-left: 3px solid #cfe2ff;
+  padding-left: 5px;
+}
 
-    .virtual-header .cell.sort-desc::before {
-      content: "▼";
-    }
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 5px 0;
+  user-select: none;
+}
 
-    .virtual-viewport {
-      overflow-y: auto;
-      flex: 1;
-      position: relative;
-    }
+.section-header h4 {
+  margin: 0;
+  color: #555;
+}
 
-    .virtual-spacer {
-      height: 0;
-    }
+.header-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .75rem;
+  color: #666;
+}
 
-    .virtual-content {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-    }
+.toggle-button {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  background-color: #f8f9fa;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
 
-    .row {
-      display: flex;
-      border-top: 0.0625rem solid #ddd;
-      padding: 0 0;
-      cursor: pointer;
-      background: white;
-      align-items: stretch;
-    }
+.toggle-button.toggled {
+  background-color: #198754;
+  color: white;
+  border-color: #198754;
+}
 
-    .row:hover {
-      background-color: #f5f5f5;
-    }
+.toggle-button:hover {
+  background-color: #e2e6ea;
+}
 
-    .cell {
-      padding: 0.375rem 0.5rem;
-      word-break: break-word;
-      white-space: pre-wrap;
-      display: flex;
-      flex-grow: 1;
-      flex-shrink: 0;
-      align-items: center;
-      border-right: 0.0625rem solid #ddd;
-      cursor: pointer;
-    }
+.toggle-button.toggled:hover {
+  background-color: #157347;
+}
 
-    .col-method   { width: 45%; flex-shrink: 0; }
-    .col-return   { width: 12%; flex-shrink: 0; }
-    .col-count    { width: 7%; flex-shrink: 0; }
-    .col-type     { width: 5%; flex-shrink: 0; }
-    .col-tag      { width: 13%; flex-shrink: 0; }
 
-    .table-scroll-wrapper {
-      overflow-x: auto;
-      width: 100%;
-    }
+.section-content {
+  padding-left: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.section-header:hover {
+  background-color: #f8f9fa;
+}
+
+.header-btn:hover {
+  color: #333;
+}
+
+@keyframes copyFlash {
+  0% { color: green; }
+  100% { color: #666; }
+}
+
+.copy-flash {
+  animation: copyFlash 1s;
+}
+
+.virtual-table {
+  min-width: 1000px;
+  max-height: 65vh;
+  border: 0.0625rem solid #ddd;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  font-size: .875rem;
+}
+
+.virtual-header {
+  display: flex;
+  background: #f0f0f0;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  border-bottom: 0.0625rem solid #ddd;
+}
+
+.virtual-header .cell.sort-asc::before {
+  content: "▲";
+}
+
+.virtual-header .cell.sort-desc::before {
+  content: "▼";
+}
+
+.virtual-viewport {
+  overflow-y: auto;
+  flex: 1;
+  position: relative;
+}
+
+.virtual-spacer {
+  height: 0;
+}
+
+.virtual-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.row {
+  display: flex;
+  border-top: 0.0625rem solid #ddd;
+  padding: 0 0;
+  cursor: pointer;
+  background: white;
+  align-items: stretch;
+}
+
+.row:hover {
+  background-color: #f5f5f5;
+}
+
+.cell {
+  padding: 0.375rem 0.5rem;
+  word-break: break-word;
+  white-space: pre-wrap;
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 0;
+  align-items: center;
+  border-right: 0.0625rem solid #ddd;
+  cursor: pointer;
+}
+
+.col-method   { width: 45%; flex-shrink: 0; }
+.col-return   { width: 12%; flex-shrink: 0; }
+.col-count    { width: 7%; flex-shrink: 0; }
+.col-type     { width: 5%; flex-shrink: 0; }
+.col-tag      { width: 13%; flex-shrink: 0; }
+
+.table-scroll-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.back-to-top-btn {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 10;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease;
+}
+
+.back-to-top-btn:hover {
+  background-color: #0b5ed7;
+}
+
   </style>
 </head>
 <body>
@@ -373,14 +462,8 @@
   <div class="filters">
     <input class="filter-items" type="text" id="searchInput" placeholder="Search methods..." />
     <input class="filter-items" type="text" id="returnTypeInput" placeholder="Search return types..." />
-    <div class="filter-items">
-      <input type="checkbox" id="showCompilerGenerated" checked />
-      <label for="showCompilerGenerated">Show Compiler Generated</label>
-    </div>
-    <div class="filter-items">
-      <input type="checkbox" id="generic" checked />
-      <label for="generic">Show Generic Methods</label>
-    </div>
+    <button id="showCompilerGenerated" class="filter-items toggle-button toggled">Show Compiler Generated Methods</button>
+    <button id="generic" class="filter-items toggle-button toggled">Show Generic Methods</button>
     <input class="filter-items" type="number" id="minMonoCount" placeholder="Min Mono Count" min="0" />
     <input class="filter-items" type="number" id="minXrefCount" placeholder="Min Xref Count" min="0" />
     <select class="filter-items" id="tagFilter">
@@ -414,491 +497,527 @@
     </div>  
   </div>
   <script> 
-    let methodData = {};
-    let allEntries = [];
-    let visibleEntries = [];
-    let sortField = null;
-    let sortAsc = true;
-    
-    const openWindows = new Set();
+let methodData = {};
+let allEntries = [];
+let visibleEntries = [];
+let sortField = null;
+let sortAsc = true;
 
-    let rowHeights = [];
-    let totalHeight = 0;
-    let scrollTop = 0;
+const openWindows = new Set();
 
-    function updateDatasetFromJson() {
-      allEntries = Object.entries(methodData).map(([method, data]) => {
-        let tag = "Matched";
-        let tagClass = "matched";
-        if (data.MonoCount > data.XrefCount) {
-          tag = "Potentially Inlined";
-          tagClass = "inlined";
-        } else if (data.XrefCount > data.MonoCount) {
-          tag = "Potentially used by Inlined method";
-          tagClass = "used-by-inline";
-        }
-        if (data.IsStripped) {
-          tag = "Potentially Stripped";
-          tagClass = "stripped";
-        }
+let rowHeights = [];
+let totalHeight = 0;
+let scrollTop = 0;
 
-        return {
-          method,
-          ReturnType: data.ReturnType,
-          MonoCount: data.MonoCount,
-          XrefCount: data.XrefCount,
-          CompilerGenerated: data.IsCompilerGenerated,
-          Generic: data.IsGeneric,
-          type: data.IsProperty ? "Property" : "Method",
-          tag,
-          tagClass
-        };
-      });
-
-      renderVirtualTable();
+function updateDatasetFromJson() {
+  allEntries = Object.entries(methodData).map(([method, data]) => {
+    let tag = "Matched";
+    let tagClass = "matched";
+    if (data.MonoCount > data.XrefCount) {
+      tag = "Potentially Inlined";
+      tagClass = "inlined";
+    } else if (data.XrefCount > data.MonoCount) {
+      tag = "Potentially used by Inlined method";
+      tagClass = "used-by-inline";
+    }
+    if (data.IsStripped) {
+      tag = "Potentially Stripped";
+      tagClass = "stripped";
     }
 
-    function renderVirtualTable() {
-      const filter = document.getElementById("searchInput").value.trim().toLowerCase();
-      const returnTypeFilter = document.getElementById("returnTypeInput").value.trim().toLowerCase();
-      const tagFilter = document.getElementById("tagFilter").value;
-      const typeFilter = document.getElementById("typeFilter").value;
-      const showCompilerGenerated = document.getElementById("showCompilerGenerated").checked;
-      const generic = document.getElementById("generic").checked;
-      const minMono = parseInt(document.getElementById("minMonoCount").value, 10) || 0;
-      const minXref = parseInt(document.getElementById("minXrefCount").value, 10) || 0;
+    return {
+      method,
+      ReturnType: data.ReturnType,
+      MonoCount: data.MonoCount,
+      XrefCount: data.XrefCount,
+      CompilerGenerated: data.IsCompilerGenerated,
+      Generic: data.IsGeneric,
+      type: data.IsProperty ? "Property" : "Method",
+      tag,
+      tagClass
+    };
+  });
+
+  renderVirtualTable();
+}
+
+function renderVirtualTable() {
+  const filter = document.getElementById("searchInput").value.trim().toLowerCase();
+  const returnTypeFilter = document.getElementById("returnTypeInput").value.trim().toLowerCase();
+  const tagFilter = document.getElementById("tagFilter").value;
+  const typeFilter = document.getElementById("typeFilter").value;
+  const showCompilerGenerated = document.getElementById("showCompilerGenerated").classList.contains("toggled");
+  const generic = document.getElementById("generic").classList.contains("toggled");
+  const minMono = parseInt(document.getElementById("minMonoCount").value, 10) || 0;
+  const minXref = parseInt(document.getElementById("minXrefCount").value, 10) || 0;
 
 
-      visibleEntries = allEntries.filter(entry => {
-        const matchesMethod = !filter || entry.method.toLowerCase().includes(filter);
-        const matchesReturn = !returnTypeFilter || (entry.ReturnType.toLowerCase().includes(returnTypeFilter));
-        const matchesTag = !tagFilter || entry.tagClass === tagFilter;
-        const matchesType = !typeFilter || entry.type === typeFilter;
-        const matchesCompilerGenerated = showCompilerGenerated || !entry.CompilerGenerated;
-        const matchesGeneric = generic || !entry.Generic;
-        const matchesMonoCount = entry.MonoCount >= minMono;
-        const matchesXrefCount = entry.XrefCount >= minXref;
-        return matchesMethod && matchesReturn && matchesTag && matchesType && 
-        matchesCompilerGenerated && matchesGeneric && matchesMonoCount && matchesXrefCount;
-      });
+  visibleEntries = allEntries.filter(entry => {
+    const matchesMethod = !filter || entry.method.toLowerCase().includes(filter);
+    const matchesReturn = !returnTypeFilter || (entry.ReturnType.toLowerCase().includes(returnTypeFilter));
+    const matchesTag = !tagFilter || entry.tagClass === tagFilter;
+    const matchesType = !typeFilter || entry.type === typeFilter;
+    const matchesCompilerGenerated = showCompilerGenerated || !entry.CompilerGenerated;
+    const matchesGeneric = generic || !entry.Generic;
+    const matchesMonoCount = entry.MonoCount >= minMono;
+    const matchesXrefCount = entry.XrefCount >= minXref;
+    return matchesMethod && matchesReturn && matchesTag && matchesType && 
+    matchesCompilerGenerated && matchesGeneric && matchesMonoCount && matchesXrefCount;
+  });
 
-      if (sortField) {
-        visibleEntries.sort((a, b) => {
-          const valA = a[sortField];
-          const valB = b[sortField];
-          if (valA < valB) return sortAsc ? -1 : 1;
-          if (valA > valB) return sortAsc ? 1 : -1;
-          return 0;
-        });
+  if (sortField) {
+    visibleEntries.sort((a, b) => {
+      const valA = a[sortField];
+      const valB = b[sortField];
+      if (valA < valB) return sortAsc ? -1 : 1;
+      if (valA > valB) return sortAsc ? 1 : -1;
+      return 0;
+    });
+  }
+
+  document.getElementById("countDisplay").textContent = `${visibleEntries.length}/${allEntries.length}`;
+  rowHeights = new Array(visibleEntries.length).fill(40);
+  totalHeight = rowHeights.reduce((a, b) => a + b, 0);
+  document.getElementById("virtual-spacer").style.height = totalHeight + "px";
+  renderVisibleRows();
+}
+
+function renderVisibleRows() {
+  const container = document.getElementById("virtual-viewport");
+  const content = document.getElementById("virtual-content");
+  scrollTop = container.scrollTop;
+  const height = container.clientHeight;
+
+  let start = 0;
+  let offset = 0;
+  while (offset + (rowHeights[start] || 40) < scrollTop && start < rowHeights.length) {
+    offset += rowHeights[start];
+    start++;
+  }
+
+  let end = start;
+  let visibleHeight = 0;
+  while (visibleHeight < height && end < rowHeights.length) {
+    visibleHeight += rowHeights[end];
+    end++;
+  }
+
+  content.innerHTML = '';
+  let y = offset;
+
+  for (let i = start; i < end; i++) {
+    const entry = visibleEntries[i];
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.position = "absolute";
+    row.style.top = y + "px";
+    row.style.left = 0;
+    row.style.right = 0;
+
+    row.innerHTML = `
+      <div class="cell col-method">
+        <button class="copy-btn" title="Copy"></button>
+        <span class="method-name">${highlightMatch(entry.method, document.getElementById("searchInput").value)}</span>
+      </div>
+      <div class="cell col-return">
+        <span class="return-type">${highlightMatch(entry.ReturnType, document.getElementById("returnTypeInput").value)}</span>
+      </div>
+      <div class="cell col-count">${entry.MonoCount}</div>
+      <div class="cell col-count">${entry.XrefCount}</div>
+      <div class="cell col-type">${entry.type}</div>
+      <div class="cell col-tag"><span class="tag ${entry.tagClass}">${entry.tag}</span></div>
+    `;
+    const copyBtn = row.querySelector(".copy-btn");
+    setupCopyButton(copyBtn, entry.method);
+
+    row.addEventListener('click', () => showUsages(entry.method));
+    content.appendChild(row);
+
+    requestAnimationFrame(() => {
+      const h = row.getBoundingClientRect().height;
+      if (h !== rowHeights[i]) {
+        rowHeights[i] = h;
+        document.getElementById("virtual-spacer").style.height =
+          rowHeights.reduce((a, b) => a + b, 0) + "px";
       }
-
-      document.getElementById("countDisplay").textContent = `${visibleEntries.length}/${allEntries.length}`;
-      rowHeights = new Array(visibleEntries.length).fill(40);
-      totalHeight = rowHeights.reduce((a, b) => a + b, 0);
-      document.getElementById("virtual-spacer").style.height = totalHeight + "px";
-      renderVisibleRows();
-    }
-
-    function renderVisibleRows() {
-      const container = document.getElementById("virtual-viewport");
-      const content = document.getElementById("virtual-content");
-      scrollTop = container.scrollTop;
-      const height = container.clientHeight;
-
-      let start = 0;
-      let offset = 0;
-      while (offset + (rowHeights[start] || 40) < scrollTop && start < rowHeights.length) {
-        offset += rowHeights[start];
-        start++;
-      }
-
-      let end = start;
-      let visibleHeight = 0;
-      while (visibleHeight < height && end < rowHeights.length) {
-        visibleHeight += rowHeights[end];
-        end++;
-      }
-
-      content.innerHTML = '';
-      let y = offset;
-
-      for (let i = start; i < end; i++) {
-        const entry = visibleEntries[i];
-        const row = document.createElement("div");
-        row.className = "row";
-        row.style.position = "absolute";
-        row.style.top = y + "px";
-        row.style.left = 0;
-        row.style.right = 0;
-
-        row.innerHTML = `
-          <div class="cell col-method">
-            <button class="copy-btn" title="Copy"></button>
-            <span class="method-name">${highlightMatch(entry.method, document.getElementById("searchInput").value)}</span>
-          </div>
-          <div class="cell col-return">
-            <span class="return-type">${highlightMatch(entry.ReturnType, document.getElementById("returnTypeInput").value)}</span>
-          </div>
-          <div class="cell col-count">${entry.MonoCount}</div>
-          <div class="cell col-count">${entry.XrefCount}</div>
-          <div class="cell col-type">${entry.type}</div>
-          <div class="cell col-tag"><span class="tag ${entry.tagClass}">${entry.tag}</span></div>
-        `;
-        const copyBtn = row.querySelector(".copy-btn");
-        setupCopyButton(copyBtn, entry.method);
-
-        row.addEventListener('click', () => showUsages(entry.method));
-        content.appendChild(row);
-
-        requestAnimationFrame(() => {
-          const h = row.getBoundingClientRect().height;
-          if (h !== rowHeights[i]) {
-            rowHeights[i] = h;
-            document.getElementById("virtual-spacer").style.height =
-              rowHeights.reduce((a, b) => a + b, 0) + "px";
-          }
-        });
-
-        y += rowHeights[i] || 40;
-      }
-    }
-
-    document.getElementById("virtual-viewport").addEventListener("scroll", renderVisibleRows);
-
-    function setupCopyButton(button, textToCopy) {
-      button.addEventListener('click', (e) => {
-          e.stopPropagation();
-          navigator.clipboard.writeText(textToCopy).then(() => {
-              button.classList.add('copy-flash');
-              setTimeout(() => {
-                  button.classList.remove('copy-flash');
-              }, 1000);
-          }).catch(err => {
-              button.classList.add('copy-error');
-              setTimeout(() => {
-                  button.classList.remove('copy-error');
-              }, 1000);
-              console.error('Failed to copy:', err);
-          });
-      });
-    }
-
-    function createUsageWindow(methodName) {
-      const method = methodData[methodName];
-      if (!method) return;
-          
-      const windowEl = document.createElement('div');
-      const windowId = 'window-' + Date.now();
-
-      windowEl.className = 'usage-window';
-      windowEl.id = windowId;
-      
-      const header = document.createElement('div');
-      header.className = 'window-header';
-      
-      const title = document.createElement('span');
-      title.className = 'window-title';
-      title.textContent = `Usages of: ${methodName}`;
-      
-      const closeBtn = document.createElement('span');
-      closeBtn.className = 'window-close';
-      closeBtn.textContent = '×';
-      
-      header.append(title, closeBtn);
-      windowEl.append(header);
-      
-      const body = document.createElement('div');
-      body.className = 'window-body';
-      
-      const monoSection = createUsageSection(
-        'Mono Usages', 
-        method.MonoUsages, 
-        method.XrefUsages,
-        'mono-only'
-      );
-      body.append(monoSection);
-      
-      const xrefSection = createUsageSection(
-        'Xref Usages',
-        method.XrefUsages,
-        method.MonoUsages,
-        'xref-only'
-      );
-      body.append(xrefSection);
-      
-      windowEl.append(body);
-
-      const resizeHandle = document.createElement('div');
-      resizeHandle.className = 'resize-handle';
-      windowEl.appendChild(resizeHandle);
-
-      function createUsageSection(title, items, compareItems, diffClass) {
-        const section = document.createElement('div');
-        section.className = 'usage-section';
-        
-        const header = document.createElement('div');
-        header.className = 'section-header';
-        header.dataset.section = title.toLowerCase().replace(' ', '-');
-        
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = 'toggle-btn';
-        toggleBtn.textContent = '▼';
-        
-        const titleEl = document.createElement('h4');
-        titleEl.textContent = `${title} (${items?.length || 0})`;
-        
-        header.append(toggleBtn, titleEl);
-        section.append(header);
-        
-        const content = document.createElement('div');
-        content.className = `section-content ${header.dataset.section}-section`;
-        
-        if (!items || items.length === 0) {
-            const noItems = document.createElement('div');
-            noItems.className = 'no-usages';
-            noItems.textContent = `No ${title} found`;
-            content.append(noItems);
-        } else {
-          items.forEach(usage => {
-            const item = document.createElement('div');
-            item.className = 'usage-item';
-            
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'copy-btn';
-            copyBtn.title = 'Copy to clipboard';
-            
-            const usageText = document.createElement('span');
-            usageText.textContent = usage;
-            usageText.style.flexGrow = '1';
-            
-            item.append(copyBtn, usageText);
-            
-            setupCopyButton(copyBtn, usage);
-            
-            if (compareItems && !compareItems.includes(usage)) {
-                item.classList.add(diffClass);
-            }
-            
-            content.append(item);
-          });
-        }
-        
-        section.append(content);
-        return section;
-    }
-      
-      windowEl.querySelectorAll('.section-header').forEach(header => {
-        header.addEventListener('click', (e) => {
-          if (e.target.classList.contains('toggle-btn')) return;
-          
-          const btn = header.querySelector('.toggle-btn');
-          const section = header.nextElementSibling;
-          section.style.display = section.style.display === 'none' ? 'block' : 'none';
-          btn.textContent = section.style.display === 'none' ? '▶' : '▼';
-        });
-      });
-
-      windowEl.querySelectorAll('.toggle-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const header = e.target.closest('.section-header');
-          const section = header.nextElementSibling;
-          section.style.display = section.style.display === 'none' ? 'block' : 'none';
-          btn.textContent = section.style.display === 'none' ? '▶' : '▼';
-        });
-      });
-      
-      document.body.appendChild(windowEl);
-      openWindows.add(windowId);
-      
-      setupWindowDrag(windowEl);
-      setupWindowResize(windowEl, resizeHandle);
-      
-      closeBtn.addEventListener('click', () => {
-        document.body.removeChild(windowEl);
-        openWindows.delete(windowId);
-      });
-      
-      return windowEl;
-    }
-    
-    function setupWindowDrag(windowEl) {
-      const header = windowEl.querySelector('.window-header');
-      let isDragging = false;
-      let offsetX, offsetY;
-      
-      header.addEventListener('mousedown', (e) => {
-        if (e.target.classList.contains('window-close') || 
-            e.target.classList.contains('resize-handle')) {
-          return;
-        }
-        
-        isDragging = true;
-        offsetX = e.clientX - windowEl.getBoundingClientRect().left;
-        offsetY = e.clientY - windowEl.getBoundingClientRect().top;
-        windowEl.style.cursor = 'grabbing';
-        e.preventDefault();
-      });
-      
-      document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        
-        windowEl.style.left = `${e.clientX - offsetX}px`;
-        windowEl.style.top = `${e.clientY - offsetY}px`;
-        windowEl.style.right = 'auto';
-      });
-      
-      document.addEventListener('mouseup', () => {
-        isDragging = false;
-        windowEl.style.cursor = '';
-      });
-    }
-    
-    function setupWindowResize(element, handle) {
-      let startX, startY, startWidth, startHeight;
-
-      function initResize(e) {
-        e.preventDefault();
-        startX = e.clientX;
-        startY = e.clientY;
-        startWidth = parseInt(document.defaultView.getComputedStyle(element).width, 10);
-        startHeight = parseInt(document.defaultView.getComputedStyle(element).height, 10);
-        document.addEventListener('mousemove', resize);
-        document.addEventListener('mouseup', stopResize);
-      }
-
-      function resize(e) {
-        element.style.width = (startWidth + e.clientX - startX) + 'px';
-        element.style.height = (startHeight + e.clientY - startY) + 'px';
-      }
-
-      function stopResize() {
-        document.removeEventListener('mousemove', resize);
-        document.removeEventListener('mouseup', stopResize);
-      }
-
-      handle.addEventListener('mousedown', initResize);
-    }
-
-    function showUsages(methodName) {
-      createUsageWindow(methodName);
-    }
-
-    function updateCountDisplay() {
-      document.getElementById("countDisplay").textContent = `${filteredCount}/${totalCount}`;
-    }
-
-    function highlightMatch(text, filter) {
-      if (!filter) return escapeHTML(text);
-
-      const lowerText = text.toLowerCase();
-      const lowerFilter = filter.toLowerCase();
-      const fragment = document.createDocumentFragment();
-      
-      let lastIndex = 0;
-      let index = lowerText.indexOf(lowerFilter);
-
-      while (index !== -1) {
-        if (index > lastIndex) {
-          fragment.appendChild(document.createTextNode(text.slice(lastIndex, index)));
-        }
-
-        const highlightSpan = document.createElement('span');
-        highlightSpan.className = 'highlight';
-        highlightSpan.textContent = text.slice(index, index + filter.length);
-        fragment.appendChild(highlightSpan);
-
-        lastIndex = index + filter.length;
-        index = lowerText.indexOf(lowerFilter, lastIndex);
-      }
-
-      if (lastIndex < text.length) {
-        fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
-      }
-
-      const container = document.createElement('div');
-      container.appendChild(fragment);
-      return container.innerHTML;
-    }
-
-    function escapeHTML(str) {
-      const div = document.createElement("div");
-      div.innerText = str;
-      return div.innerHTML;
-    }
-
-    function debounce(func, wait) {
-      let timeout;
-      return function(...args) {
-        const context = this;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), wait);
-      };
-    }
-
-    function loadOnline() {
-      fetch("method_analysis_results.json")
-        .then(response => response.json())
-        .then(data => {
-          methodData = data;
-          updateDatasetFromJson();
-        })
-        .catch(err => {
-          alert("Failed to load online JSON");
-          console.error(err);
-        });
-    }
-
-    document.getElementById("fileInput").addEventListener("change", function (event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        try {
-          methodData = JSON.parse(e.target.result);
-          updateDatasetFromJson();
-        } catch (err) {
-          alert("Invalid JSON file");
-          console.error(err);
-        }
-      };
-
-      reader.readAsText(file);
     });
 
-    document.getElementById("searchInput").addEventListener("input", renderVirtualTable);
-    document.getElementById("returnTypeInput").addEventListener("input", renderVirtualTable);
-    document.getElementById("tagFilter").addEventListener("change", renderVirtualTable);
-    document.getElementById("typeFilter").addEventListener("change", renderVirtualTable);
-    document.getElementById("showCompilerGenerated").addEventListener("change", renderVirtualTable);
-    document.getElementById("generic").addEventListener("change", renderVirtualTable);
-    document.getElementById("minMonoCount").addEventListener("input", renderVirtualTable);
-    document.getElementById("minXrefCount").addEventListener("input", renderVirtualTable);
+    y += rowHeights[i] || 40;
+  }
+}
 
-    document.querySelectorAll(".virtual-header .cell").forEach(th => {
-      th.addEventListener("click", () => {
-        const field = th.dataset.sort;
-        if (sortField === field) {
-          sortAsc = !sortAsc;
-        } else {
-          sortField = field;
-          sortAsc = true;
+document.getElementById("virtual-viewport").addEventListener("scroll", renderVisibleRows);
+
+function setupCopyButton(button, textToCopy) {
+  button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(textToCopy).then(() => {
+          button.classList.add('copy-flash');
+          setTimeout(() => {
+              button.classList.remove('copy-flash');
+          }, 1000);
+      }).catch(err => {
+          button.classList.add('copy-error');
+          setTimeout(() => {
+              button.classList.remove('copy-error');
+          }, 1000);
+          console.error('Failed to copy:', err);
+      });
+  });
+}
+
+function createUsageWindow(methodName) {
+  const method = methodData[methodName];
+  if (!method) return;
+      
+  const windowEl = document.createElement('div');
+  const windowId = 'window-' + Date.now();
+
+  windowEl.className = 'usage-window';
+  windowEl.id = windowId;
+  
+  const header = document.createElement('div');
+  header.className = 'window-header';
+  
+  const title = document.createElement('span');
+  title.className = 'window-title';
+  title.textContent = `Usages of: ${methodName}`;
+  
+  const closeBtn = document.createElement('span');
+  closeBtn.className = 'window-close';
+  closeBtn.textContent = '×';
+  
+  header.append(title, closeBtn);
+  windowEl.append(header);
+  
+  const body = document.createElement('div');
+  body.className = 'window-body';
+  
+  const monoSection = createUsageSection(
+    'Mono Usages', 
+    method.MonoUsages, 
+    method.XrefUsages,
+    'mono-only'
+  );
+  body.append(monoSection);
+  
+  const xrefSection = createUsageSection(
+    'Xref Usages',
+    method.XrefUsages,
+    method.MonoUsages,
+    'xref-only'
+  );
+  body.append(xrefSection);
+  
+  windowEl.append(body);
+
+  const backToTopBtn = document.createElement("button");
+  backToTopBtn.className = "back-to-top-btn";
+  backToTopBtn.textContent = "↑ Back to Top";
+  backToTopBtn.style.opacity = "0";
+  backToTopBtn.disabled = true;
+  windowEl.appendChild(backToTopBtn);
+
+  body.addEventListener("scroll", () => {
+    backToTopBtn.disabled = body.scrollTop < 200;
+    backToTopBtn.style.opacity = body.scrollTop > 200 ? "1" : "0";
+  });
+
+  backToTopBtn.addEventListener("click", () => {
+    body.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  const resizeHandle = document.createElement('div');
+  resizeHandle.className = 'resize-handle';
+  windowEl.appendChild(resizeHandle);
+
+  function createUsageSection(title, items, compareItems, diffClass) {
+    const section = document.createElement('div');
+    section.className = 'usage-section';
+    
+    const header = document.createElement('div');
+    header.className = 'section-header';
+    header.dataset.section = title.toLowerCase().replace(' ', '-');
+    
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'header-btn';
+    toggleBtn.textContent = '▼';
+    
+    const titleEl = document.createElement('h4');
+    titleEl.textContent = `${title} (${items?.length || 0})`;
+    
+    header.append(toggleBtn, titleEl);
+    section.append(header);
+    
+    const content = document.createElement('div');
+    content.className = `section-content ${header.dataset.section}-section`;
+    
+    if (!items || items.length === 0) {
+        const noItems = document.createElement('div');
+        noItems.className = 'no-usages';
+        noItems.textContent = `No ${title} found`;
+        content.append(noItems);
+    } else {
+      items.forEach(usage => {
+        const item = document.createElement('div');
+        item.className = 'usage-item';
+        
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.title = 'Copy to clipboard';
+        
+        const usageText = document.createElement('span');
+        usageText.textContent = usage;
+        usageText.style.flexGrow = '1';
+        
+        item.append(copyBtn, usageText);
+        
+        setupCopyButton(copyBtn, usage);
+        
+        if (compareItems && !compareItems.includes(usage)) {
+            item.classList.add(diffClass);
         }
         
-
-        // Clear all arrows
-        document.querySelectorAll(".virtual-header .cell").forEach(cell => {
-          cell.classList.remove("sort-asc", "sort-desc");
-        });
-
-        // Add arrow to selected header
-        th.classList.add(sortAsc ? "sort-asc" : "sort-desc");
-
-        renderVirtualTable();
+        content.append(item);
       });
+    }
+    
+    section.append(content);
+    return section;
+}
+  
+  windowEl.querySelectorAll('.section-header').forEach(header => {
+    header.addEventListener('click', (e) => {
+      if (e.target.classList.contains('header-btn')) return;
+      
+      const btn = header.querySelector('.header-btn');
+      const section = header.nextElementSibling;
+      section.style.display = section.style.display === 'none' ? 'block' : 'none';
+      btn.textContent = section.style.display === 'none' ? '▶' : '▼';
+    });
+  });
+
+  windowEl.querySelectorAll('.header-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const header = e.target.closest('.section-header');
+      const section = header.nextElementSibling;
+      section.style.display = section.style.display === 'none' ? 'block' : 'none';
+      btn.textContent = section.style.display === 'none' ? '▶' : '▼';
+    });
+  });
+  
+  document.body.appendChild(windowEl);
+  openWindows.add(windowId);
+
+  setupWindowDrag(windowEl);
+  setupWindowResize(windowEl, resizeHandle);
+
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(windowEl);
+    openWindows.delete(windowId);
+  });
+  
+  return windowEl;
+}
+
+function setupWindowDrag(windowEl) {
+  const header = windowEl.querySelector('.window-header');
+  let isDragging = false;
+  let offsetX, offsetY;
+  
+  header.addEventListener('mousedown', (e) => {
+    if (window.innerWidth < 768) {
+      return;
+    }
+
+    if (e.target.classList.contains('window-close') || 
+        e.target.classList.contains('resize-handle')) {
+      return;
+    }
+    
+    isDragging = true;
+    offsetX = e.clientX - windowEl.getBoundingClientRect().left;
+    offsetY = e.clientY - windowEl.getBoundingClientRect().top;
+    windowEl.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+  
+  document.addEventListener('mousemove', (e) => {
+    if (window.innerWidth < 768) {
+      isDragging = false;
+      windowEl.style.left = '';
+      windowEl.style.top = '';
+      windowEl.style.right = '';
+      windowEl.style.cursor = '';
+      return;
+    }
+
+    if (!isDragging) return;
+    
+    windowEl.style.left = `${e.clientX - offsetX}px`;
+    windowEl.style.top = `${e.clientY - offsetY}px`;
+    windowEl.style.right = 'auto';
+  });
+  
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+    windowEl.style.cursor = '';
+  });
+}
+
+function setupWindowResize(element, handle) {
+  let startX, startY, startWidth, startHeight;
+
+  function initResize(e) {
+    e.preventDefault();
+    startX = e.clientX;
+    startY = e.clientY;
+    startWidth = parseInt(document.defaultView.getComputedStyle(element).width, 10);
+    startHeight = parseInt(document.defaultView.getComputedStyle(element).height, 10);
+    document.addEventListener('mousemove', resize);
+    document.addEventListener('mouseup', stopResize);
+  }
+
+  function resize(e) {
+    element.style.width = (startWidth + e.clientX - startX) + 'px';
+    element.style.height = (startHeight + e.clientY - startY) + 'px';
+  }
+
+  function stopResize() {
+    document.removeEventListener('mousemove', resize);
+    document.removeEventListener('mouseup', stopResize);
+  }
+
+  handle.addEventListener('mousedown', initResize);
+}
+
+function showUsages(methodName) {
+  createUsageWindow(methodName);
+}
+
+function updateCountDisplay() {
+  document.getElementById("countDisplay").textContent = `${filteredCount}/${totalCount}`;
+}
+
+function highlightMatch(text, filter) {
+  if (!filter) return escapeHTML(text);
+
+  const lowerText = text.toLowerCase();
+  const lowerFilter = filter.toLowerCase();
+  const fragment = document.createDocumentFragment();
+  
+  let lastIndex = 0;
+  let index = lowerText.indexOf(lowerFilter);
+
+  while (index !== -1) {
+    if (index > lastIndex) {
+      fragment.appendChild(document.createTextNode(text.slice(lastIndex, index)));
+    }
+
+    const highlightSpan = document.createElement('span');
+    highlightSpan.className = 'highlight';
+    highlightSpan.textContent = text.slice(index, index + filter.length);
+    fragment.appendChild(highlightSpan);
+
+    lastIndex = index + filter.length;
+    index = lowerText.indexOf(lowerFilter, lastIndex);
+  }
+
+  if (lastIndex < text.length) {
+    fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+  }
+
+  const container = document.createElement('div');
+  container.appendChild(fragment);
+  return container.innerHTML;
+}
+
+function escapeHTML(str) {
+  const div = document.createElement("div");
+  div.innerText = str;
+  return div.innerHTML;
+}
+
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), wait);
+  };
+}
+
+function loadOnline() {
+  fetch("method_analysis_results.json")
+    .then(response => response.json())
+    .then(data => {
+      methodData = data;
+      updateDatasetFromJson();
+    })
+    .catch(err => {
+      alert("Failed to load online JSON");
+      console.error(err);
+    });
+}
+
+document.getElementById("fileInput").addEventListener("change", function (event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      methodData = JSON.parse(e.target.result);
+      updateDatasetFromJson();
+    } catch (err) {
+      alert("Invalid JSON file");
+      console.error(err);
+    }
+  };
+
+  reader.readAsText(file);
+});
+
+document.querySelectorAll(".toggle-button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    btn.classList.toggle("toggled");
+    renderVirtualTable();
+  });
+});
+
+
+document.getElementById("searchInput").addEventListener("input", renderVirtualTable);
+document.getElementById("returnTypeInput").addEventListener("input", renderVirtualTable);
+document.getElementById("tagFilter").addEventListener("change", renderVirtualTable);
+document.getElementById("typeFilter").addEventListener("change", renderVirtualTable);
+document.getElementById("showCompilerGenerated").addEventListener("change", renderVirtualTable);
+document.getElementById("generic").addEventListener("change", renderVirtualTable);
+document.getElementById("minMonoCount").addEventListener("input", renderVirtualTable);
+document.getElementById("minXrefCount").addEventListener("input", renderVirtualTable);
+
+document.querySelectorAll(".virtual-header .cell").forEach(th => {
+  th.addEventListener("click", () => {
+    const field = th.dataset.sort;
+    if (sortField === field) {
+      sortAsc = !sortAsc;
+    } else {
+      sortField = field;
+      sortAsc = true;
+    }
+    
+
+    // Clear all arrows
+    document.querySelectorAll(".virtual-header .cell").forEach(cell => {
+      cell.classList.remove("sort-asc", "sort-desc");
     });
 
-  </script>
+    // Add arrow to selected header
+    th.classList.add(sortAsc ? "sort-asc" : "sort-desc");
+
+    renderVirtualTable();
+  });
+});
+</script>
 </body>
 </html>
