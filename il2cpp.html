@@ -575,6 +575,12 @@ function renderVirtualTable() {
   totalHeight = rowHeights.reduce((a, b) => a + b, 0);
   document.getElementById("virtual-spacer").style.height = totalHeight + "px";
   renderVisibleRows();
+
+  // we use requestAnimationFrame to call renderVisibleRows again
+  // to fix row height issues when changing filters or sorting
+  requestAnimationFrame(() => {
+    renderVisibleRows();
+  });
 }
 
 function renderVisibleRows() {
@@ -1037,13 +1043,10 @@ document.querySelectorAll(".virtual-header .cell").forEach(th => {
       sortAsc = true;
     }
     
-
-    // Clear all arrows
     document.querySelectorAll(".virtual-header .cell").forEach(cell => {
       cell.classList.remove("sort-asc", "sort-desc");
     });
 
-    // Add arrow to selected header
     th.classList.add(sortAsc ? "sort-asc" : "sort-desc");
 
     renderVirtualTable();
