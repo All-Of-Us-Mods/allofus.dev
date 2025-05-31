@@ -68,6 +68,74 @@ h1 {
   flex: 1;
   min-width: 150px;
   font-size: 0.875rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+}
+
+.multi-filter {
+  position: relative;
+  display: inline-block;
+  padding: 0;
+}
+
+.multi-filter-toggle {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background-color: #fff;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.multi-filter-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.25rem;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  z-index: 2000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  min-width: 100px;
+}
+
+.multi-filter-button {
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  background-color: #f8f9fa;
+  color: #333;
+  cursor: pointer;
+  margin-right: 0.25rem;
+  margin-bottom: 0.25rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.multi-filter-button.toggled {
+  background-color: #198754;
+  color: white;
+  border-color: #198754;
+}
+
+.multi-filter-button.toggled:hover {
+  background-color: #157347;
+}
+
+.multi-filter-button:hover {
+  background-color: #e2e6ea;
+}
+
+.multi-filter-dropdown.hidden {
+  display: none;
 }
 
 #searchInput {
@@ -476,23 +544,31 @@ h1 {
   <div class="filters">
     <input class="filter-items" type="text" id="searchInput" placeholder="Search methods..." />
     <input class="filter-items" type="text" id="returnTypeInput" placeholder="Search return types..." />
+
     <button id="showCompilerGenerated" class="filter-items toggle-button toggled">Toggle Compiler Generated Methods</button>
     <button id="generic" class="filter-items toggle-button toggled">Toggle Generic Methods</button>
+
     <input class="filter-items" type="number" id="minMonoCount" placeholder="Min Mono Count" min="0" />
     <input class="filter-items" type="number" id="minXrefCount" placeholder="Min Xref Count" min="0" />
-    <select class="filter-items" id="tagFilter">
-      <option value="">All Tags</option>
-      <option value="inlined">Potentially Inlined</option>
-      <option value="used-by-inline">Potentially used by Inlined method</option>
-      <option value="stripped">Potentially Stripped</option>
-      <option value="matched">Matched</option>
-      <option value="flagged">Flagged</option>
-    </select>
-    <select class="filter-items" id="typeFilter">
-      <option value="">All Types</option>
-      <option value="Method">Method</option>
-      <option value="Property">Property</option>
-    </select>
+
+    <div class="filter-items multi-filter" id="tagFilter">
+      <button type="button" class="multi-filter-toggle" id="tagFilterToggle">Filter Tags ▾</button>
+      <div class="multi-filter-dropdown hidden" id="tagFilterDropdown">
+        <button class="multi-filter-button toggled" data-filter="inlined">Inlined</button>
+        <button class="multi-filter-button toggled" data-filter="used-by-inline">Used by Inlined</button>
+        <button class="multi-filter-button toggled" data-filter="stripped">Stripped</button>
+        <button class="multi-filter-button toggled" data-filter="matched">Matched</button>
+        <button class="multi-filter-button toggled" data-filter="flagged">Flagged</button>
+      </div>
+    </div>
+
+    <div class="filter-items multi-filter" id="typeFilter">
+      <button type="button" class="multi-filter-toggle" id="typeFilterToggle">Filter Types ▾</button>
+      <div class="multi-filter-dropdown hidden" id="typeFilterDropdown">
+        <button class="multi-filter-button toggled" data-filter="Method">Method</button>
+        <button class="multi-filter-button toggled" data-filter="Property">Property</button>
+      </div>
+    </div>
   </div>
   <div id="countDisplay" class="count-display">0/0</div>
   <div class="table-scroll-wrapper">
@@ -567,19 +643,20 @@ function updateDatasetFromJson() {
 function renderVirtualTable() {
   const filter = document.getElementById("searchInput").value.trim().toLowerCase();
   const returnTypeFilter = document.getElementById("returnTypeInput").value.trim().toLowerCase();
-  const tagFilter = document.getElementById("tagFilter").value;
-  const typeFilter = document.getElementById("typeFilter").value;
+
+  const selectedTags = Array.from(document.querySelectorAll('#tagFilter .multi-filter-button.toggled')).map(btn => btn.dataset.filter);
+  const typeFilter = Array.from(document.querySelectorAll('#typeFilter .multi-filter-button.toggled')).map(btn => btn.dataset.filter);
+
   const showCompilerGenerated = document.getElementById("showCompilerGenerated").classList.contains("toggled");
   const generic = document.getElementById("generic").classList.contains("toggled");
   const minMono = parseInt(document.getElementById("minMonoCount").value, 10) || 0;
   const minXref = parseInt(document.getElementById("minXrefCount").value, 10) || 0;
 
-
   visibleEntries = allEntries.filter(entry => {
     const matchesMethod = !filter || entry.method.toLowerCase().includes(filter);
     const matchesReturn = !returnTypeFilter || (entry.ReturnType.toLowerCase().includes(returnTypeFilter));
-    const matchesTag = !tagFilter || entry.tagClass === tagFilter;
-    const matchesType = !typeFilter || entry.type === typeFilter;
+    const matchesTag = selectedTags.length === 0 || selectedTags.includes(entry.tagClass);
+    const matchesType = typeFilter.length === 0 || typeFilter.includes(entry.type);
     const matchesCompilerGenerated = showCompilerGenerated || !entry.CompilerGenerated;
     const matchesGeneric = generic || !entry.Generic;
     const matchesMonoCount = entry.MonoCount >= minMono;
@@ -598,7 +675,8 @@ function renderVirtualTable() {
     });
   }
 
-  document.getElementById("countDisplay").textContent = `${visibleEntries.length}/${allEntries.length}`;
+  let percent = Math.round(visibleEntries.length / allEntries.length * 100) || 0;
+  document.getElementById("countDisplay").textContent = `${visibleEntries.length} / ${allEntries.length} (${percent}%)`;
   rowHeights = new Array(visibleEntries.length).fill(40);
   totalHeight = rowHeights.reduce((a, b) => a + b, 0);
   document.getElementById("virtual-spacer").style.height = totalHeight + "px";
@@ -1071,15 +1149,34 @@ document.querySelectorAll(".toggle-button").forEach(btn => {
   });
 });
 
+document.addEventListener('click', (e) => {
+  const filter = document.getElementById('tagFilter');
+  if (!filter.contains(e.target)) {
+    document.querySelector('.multi-filter-dropdown').classList.add('hidden');
+  }
+});
 
 document.getElementById("searchInput").addEventListener("input", renderVirtualTable);
 document.getElementById("returnTypeInput").addEventListener("input", renderVirtualTable);
-document.getElementById("tagFilter").addEventListener("change", renderVirtualTable);
-document.getElementById("typeFilter").addEventListener("change", renderVirtualTable);
 document.getElementById("showCompilerGenerated").addEventListener("change", renderVirtualTable);
 document.getElementById("generic").addEventListener("change", renderVirtualTable);
 document.getElementById("minMonoCount").addEventListener("input", renderVirtualTable);
 document.getElementById("minXrefCount").addEventListener("input", renderVirtualTable);
+
+document.querySelector('#tagFilterToggle').addEventListener('click', () => {
+  document.querySelector('#tagFilterDropdown').classList.toggle('hidden');
+});
+
+document.querySelector('#typeFilterToggle').addEventListener('click', () => {
+  document.querySelector('#typeFilterDropdown').classList.toggle('hidden');
+});
+
+document.querySelectorAll('.multi-filter-button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('toggled');
+    renderVirtualTable();
+  });
+});
 
 document.querySelectorAll(".virtual-header .cell").forEach(th => {
   th.addEventListener("click", () => {
