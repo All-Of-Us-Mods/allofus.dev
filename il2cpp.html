@@ -62,8 +62,7 @@ h1 {
 }
 
 .filter-items {
-  margin-bottom: 0.625rem;
-  padding: 0.375rem 0.625rem;
+  padding: 0.625rem;
   box-sizing: border-box;
   flex: 1;
   min-width: 150px;
@@ -155,6 +154,11 @@ h1 {
   border: 0.0625rem solid #dee2e6;
   border-radius: 0.25rem;
   display: inline-block;
+}
+
+.break {
+  flex-basis: 100%;
+  height: 0;
 }
 
 .usage-window {
@@ -384,6 +388,47 @@ h1 {
   color: #666;
 }
 
+.adv-button {
+  font-size: 0.875rem;
+  border: 1px solid #0d6efd;
+  border-radius: 0.375rem;
+  border-color: #0d6efd;
+  background-color: #0d6efd;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  flex:1;
+}
+
+#advWindow {
+  width: 400px;
+  height: 500px;
+}
+
+#advWindow .adv-button {
+  max-height: 2.5rem;
+}
+
+.adv-button:hover {
+  background-color: #0b5ed7;
+  color: white;
+}
+
+.adv-button:active {
+  background-color: #0a58ca;
+  color: white;
+}
+
+.adv-window-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.adv-window-body textarea {
+  flex:5;
+}
+
 .toggle-button {
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
@@ -533,17 +578,25 @@ h1 {
   background-color: #0b5ed7;
 }
 
+.hidden {
+  display: none;
+}
+
   </style>
 </head>
 <body>
   <h1>IL2CPP Mono Methods Analyzer</h1>
   <div class="upload-inputs">
     <input type="file" id="fileInput" accept="application/json" />
-    <button onclick="loadOnline()">Load Latest Online JSON</button>
+    <button type="button" onclick="loadOnline()">Load Latest Online JSON</button>
   </div>
   <div class="filters">
     <input class="filter-items" type="text" id="searchInput" placeholder="Search methods..." />
     <input class="filter-items" type="text" id="returnTypeInput" placeholder="Search return types..." />
+
+    <button type="button" id="advSearch" class="filter-items adv-button">Adv. Filter</button>
+
+    <div class="break"></div>
 
     <button id="showCompilerGenerated" class="filter-items toggle-button toggled">Toggle Compiler Generated Methods</button>
     <button id="generic" class="filter-items toggle-button toggled">Toggle Generic Methods</button>
@@ -554,19 +607,19 @@ h1 {
     <div class="filter-items multi-filter" id="tagFilter">
       <button type="button" class="multi-filter-toggle" id="tagFilterToggle">Filter Tags ▾</button>
       <div class="multi-filter-dropdown hidden" id="tagFilterDropdown">
-        <button class="multi-filter-button toggled" data-filter="inlined">Inlined</button>
-        <button class="multi-filter-button toggled" data-filter="used-by-inline">Used by Inlined</button>
-        <button class="multi-filter-button toggled" data-filter="stripped">Stripped</button>
-        <button class="multi-filter-button toggled" data-filter="matched">Matched</button>
-        <button class="multi-filter-button toggled" data-filter="flagged">Flagged</button>
+        <button type="button" class="multi-filter-button toggled" data-filter="inlined">Inlined</button>
+        <button type="button" class="multi-filter-button toggled" data-filter="used-by-inline">Used by Inlined</button>
+        <button type="button" class="multi-filter-button toggled" data-filter="stripped">Stripped</button>
+        <button type="button" class="multi-filter-button toggled" data-filter="matched">Matched</button>
+        <button type="button" class="multi-filter-button toggled" data-filter="flagged">Flagged</button>
       </div>
     </div>
 
     <div class="filter-items multi-filter" id="typeFilter">
       <button type="button" class="multi-filter-toggle" id="typeFilterToggle">Filter Types ▾</button>
       <div class="multi-filter-dropdown hidden" id="typeFilterDropdown">
-        <button class="multi-filter-button toggled" data-filter="Method">Method</button>
-        <button class="multi-filter-button toggled" data-filter="Property">Property</button>
+        <button type="button" class="multi-filter-button toggled" data-filter="Method">Method</button>
+        <button type="button" class="multi-filter-button toggled" data-filter="Property">Property</button>
       </div>
     </div>
   </div>
@@ -587,12 +640,25 @@ h1 {
       </div>
     </div>  
   </div>
+  <div id="advWindow" class="usage-window">
+    <div class="window-header">
+      <span class="window-title">Advanced Method Filter</span>
+      <span class="window-close">×</span>
+    </div>
+    <div class="adv-window-body window-body">
+      <textarea spellcheck="false" id="advMethodInput" rows="5" placeholder="Enter method names, one per line..."></textarea>
+      <button id="advMethodApply" class="adv-button">Apply Filter</button>
+      <button id="advMethodClear" class="adv-button">Clear Filter</button>
+    </div>
+    <div class="resize-handle"></div>
+  </div>
   <script> 
 let methodData = {};
 let allEntries = [];
 let visibleEntries = [];
 let sortField = null;
 let sortAsc = true;
+let advancedMethodLines = [];
 
 const openWindows = new Set();
 
@@ -653,6 +719,11 @@ function renderVirtualTable() {
   const minXref = parseInt(document.getElementById("minXrefCount").value, 10) || 0;
 
   visibleEntries = allEntries.filter(entry => {
+
+    function startsWith(element, index, array){
+      return entry.method.startsWith(element);
+    }
+
     const matchesMethod = !filter || entry.method.toLowerCase().includes(filter);
     const matchesReturn = !returnTypeFilter || (entry.ReturnType.toLowerCase().includes(returnTypeFilter));
     const matchesTag = selectedTags.length === 0 || selectedTags.includes(entry.tagClass);
@@ -661,8 +732,10 @@ function renderVirtualTable() {
     const matchesGeneric = generic || !entry.Generic;
     const matchesMonoCount = entry.MonoCount >= minMono;
     const matchesXrefCount = entry.XrefCount >= minXref;
+    const matchesMultiMethod = advancedMethodLines.length === 0 || advancedMethodLines.some(startsWith);
     return matchesMethod && matchesReturn && matchesTag && matchesType && 
-    matchesCompilerGenerated && matchesGeneric && matchesMonoCount && matchesXrefCount;
+    matchesCompilerGenerated && matchesGeneric && matchesMonoCount && matchesXrefCount
+    && matchesMultiMethod;
   });
 
   if (sortField) {
@@ -1173,6 +1246,30 @@ document.querySelector('#tagFilterToggle').addEventListener('click', () => {
 
 document.querySelector('#typeFilterToggle').addEventListener('click', () => {
   document.querySelector('#typeFilterDropdown').classList.toggle('hidden');
+});
+
+let advWindow = document.getElementById("advWindow");
+setupWindowDrag(advWindow);
+setupWindowResize(advWindow, advWindow.querySelector('.resize-handle'));
+
+advWindow.querySelector('.window-close').addEventListener('click', () => {
+  advWindow.classList.add("hidden");
+});
+
+document.getElementById("advSearch").addEventListener("click", () => {
+  advWindow.classList.toggle("hidden");
+});
+
+document.getElementById("advMethodApply").addEventListener("click", () => {
+  const input = document.getElementById("advMethodInput").value.trim();
+  advancedMethodLines = input ? input.split(/\r?\n/).map(line => line.trim()).filter(line => line) : [];
+  renderVirtualTable();
+});
+
+document.getElementById("advMethodClear").addEventListener("click", () => {
+  document.getElementById("advMethodInput").value = '';
+  advancedMethodLines = [];
+  renderVirtualTable();
 });
 
 document.querySelectorAll('.multi-filter-button').forEach(btn => {
