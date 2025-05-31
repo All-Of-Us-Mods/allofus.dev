@@ -1152,7 +1152,11 @@ document.querySelectorAll(".toggle-button").forEach(btn => {
 document.addEventListener('click', (e) => {
   const filter = document.getElementById('tagFilter');
   if (!filter.contains(e.target)) {
-    document.querySelector('.multi-filter-dropdown').classList.add('hidden');
+    document.querySelector('#tagFilterDropdown').classList.add('hidden');
+  }
+  const typeFilter = document.getElementById('typeFilter');
+  if (!typeFilter.contains(e.target)) {
+    document.querySelector('#typeFilterDropdown').classList.add('hidden');
   }
 });
 
