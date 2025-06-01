@@ -854,7 +854,7 @@ function setupFileInput() {
   });
 
   document.getElementById("loadOnlineBtn").addEventListener("click", (e) => {
-    fetch("method_analysis_results.json")
+    fetch("method_analysis_results.json?v=2")
       .then(response => response.json())
       .then(data => {
         loadJson(data);
