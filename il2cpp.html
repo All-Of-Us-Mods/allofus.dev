@@ -1162,11 +1162,11 @@ function createUsageWindow(methodName) {
       item.style.display = showDiffsOnly ? (item.classList.contains('common') ? 'none' : '') : '';
     });
     if (showDiffsOnly) {  
-      monoSection.querySelector('.section-header h4').textContent = `Mono Usages (${monoCount} / ${method.monoUsages.length})`;
-      xrefSection.querySelector('.section-header h4').textContent = `Xref Usages (${xrefCount} / ${method.xrefUsages.length})`;
+      monoSection.querySelector('.section-header h4').textContent = `Mono Usages (${monoCount} / ${method.MonoUsages.length})`;
+      xrefSection.querySelector('.section-header h4').textContent = `Xref Usages (${xrefCount} / ${method.XrefUsages.length})`;
     } else {
-      monoSection.querySelector('.section-header h4').textContent = `Mono Usages (${method.monoUsages.length})`;
-      xrefSection.querySelector('.section-header h4').textContent = `Xref Usages (${method.xrefUsages.length})`;
+      monoSection.querySelector('.section-header h4').textContent = `Mono Usages (${method.MonoUsages.length})`;
+      xrefSection.querySelector('.section-header h4').textContent = `Xref Usages (${method.XrefUsages.length})`;
     }
   });
 
