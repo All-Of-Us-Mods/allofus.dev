@@ -5,10 +5,167 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IL2CPP Mono Method Analyzer</title>
   <style>
+
+:root {
+  --copy-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'%3E%3C/path%3E%3C/svg%3E");
+
+  --html-bg: #fff;
+  --background: #f4f4f4;
+  --background-hover: #e0e0e0;
+
+  --background-light: #f8f9fa;
+  --background-light-hover: #e9ecef;
+
+  --background-alt: #f0f0f0;
+  --background-alt-hover: #e0e0e0;
+  --background-alt-active: #d0d0d0;
+
+  --text-color: #333;
+  --alt-text-color: #fff;
+  --text-color-light: #666;
+
+  --border-color: #ccc;
+  --border-color-light: #ddd;
+  --border-color-lighter: #eee;
+
+  --gray: #6c757d;
+  --gray-hover: #5a6268;
+  --gray-border: #adb5bd;
+
+  --red: #dc3545;
+  --red-hover: #c82333;
+  --red-border: #bd2130;
+
+  --alt-red: #f8d7da;
+  --alt-red-hover: #f5c6cb;
+  --alt-red-border: #f1b0b7;
+
+  --yellow: #ffc107;
+  --yellow-hover: #e0a800;
+  --yellow-border: #d39e00;
+
+  --blue: #0d6efd;
+  --blue-hover: #0b5ed7;
+  --blue-border: #0a58ca;
+
+  --green: #198754;
+  --green-hover: #157347;
+  --green-border: #146c43;
+
+  --alt-green: #d4edda;
+  --alt-green-hover: #c3e6cb;
+  --alt-green-border: #b1e0b8;
+
+  --light-gray: #f8f9fa;
+  --light-gray-hover: #e2e6ea;
+  --light-gray-border: #dae0e5;
+
+  --dark-gray: #343a40;
+  --dark-gray-hover: #23272b;
+  --dark-gray-border: #1d2124;
+
+  --tag-red: #842029;
+  --tag-red-bg: #f5c2c7;
+
+  --tag-yellow: #842029;
+  --tag-yellow-bg: #fff3cd;
+
+  --tag-gray: #41464b;
+  --tag-gray-bg: #e2e3e5;
+
+  --tag-blue: #084298;
+  --tag-blue-bg: #cfe2ff;
+
+  --border-width: 0.0625rem;
+  --border-width-lg: 0.15rem;
+  --border-radius: 0.375rem;
+  --border-radius-sm: 0.25rem;
+
+  --font-size: 0.875rem;
+  --font-size-lg: 1rem;
+  --font-size-sm: 0.75rem;
+}
+
+[data-theme="dark"] {
+  --copy-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'/%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'/%3E%3C/svg%3E");
+
+  --html-bg: #181a1b;
+  --background: #1e2122;
+  
+  --background-light: #181a1b;
+  --background-light-hover: #242627;
+
+  --background-alt: #1a1a1a;
+  --background-alt-hover: #242424;
+  --background-alt-active: #303030;
+
+  --text-color: #f0f0f0;
+  --alt-text-color: #fff;
+  --text-color-light: #bbb;
+
+  --border-color: #3e4446;
+  --border-color-light: #3a3e41;
+  --border-color-lighter: #35393b;
+
+  --gray: #888;
+  --gray-hover: #777;
+  --gray-border: #555;
+
+  --red: #ff6b6b;
+  --red-hover: #ff4d4d;
+  --red-border: #ff3333;
+
+  --alt-red:  rgba(74, 27, 0, 0.3);
+  --alt-red-hover: rgba(74, 27, 0, 0.5);
+  --alt-red-border: #7c7366;
+
+  --yellow: #ffd700;
+  --yellow-hover: #ffc700;
+  --yellow-border: #ffb800;
+
+  --blue: #0250c4;
+  --blue-hover: #014bb3;
+  --blue-border: #013d9f;
+
+  --green: #146c43;
+  --green-hover: #0f5a36;
+  --green-border: #20af6d;
+
+  --alt-green: rgba(16, 66, 45, 0.3);
+  --alt-green-hover: rgba(16, 66, 45, 0.5);
+  --alt-green-border: #7c7366;
+
+  --light-gray: #181a1b;
+  --light-gray-hover: #202324;
+  --light-gray-border: #2c2f31;
+
+  --dark-gray: #1a1a1a;
+  --dark-gray-hover: #121212;
+  --dark-gray-border: #0d0d0d;
+
+  --tag-red: #df7a83;
+  --tag-red-bg: #500d14;
+
+  --tag-yellow: #fff3cd;
+  --tag-yellow-bg: #3d2e00;
+
+  --tag-gray: #bcb6ad;
+  --tag-gray-bg: #282b2c;
+
+  --tag-blue: #73b8f8;
+  --tag-blue-bg: #26292a;
+}
+
+html {
+  background-color: var(--html-bg);
+  color: var(--text-color);
+}
+
 body {
   font-family: Arial, sans-serif;
   padding: 1.25rem;
-  background-color: #f4f4f4;
+  background-color: var(--background);
+  color: var(--text-color);
 }
 
 h1 {
@@ -22,50 +179,50 @@ h1 {
 
 .tag {
   padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
-  font-size: 0.85em;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
   font-weight: bold;
   display: inline-block;
 }
 
 .inlined {
-  background-color: #f5c2c7;
-  color: #842029;
+  background-color: var(--tag-red-bg);
+  color: var(--tag-red);
 }
 
 .used-by-inline {
-  background-color: #fff3cd;
-  color: #842029;
+  background-color: var(--tag-yellow-bg);
+  color: var(--tag-yellow);
 }
 
 .stripped {
-  background-color: #e2e3e5;
-  color: #41464b;
+  background-color: var(--tag-gray-bg);
+  color: var(--tag-gray);
 }
 
 .matched {
-  background-color: #cfe2ff;
-  color: #084298;
+  background-color: var(--tag-blue-bg);
+  color: var(--tag-blue);
 }
 
 .highlight {
-  background-color: yellow;
+  background-color: var(--yellow);
   font-weight: bold;
 }
 
 .button-base {
   padding: 0.5rem;
-  font-size: 0.875rem;
-  border: 1px solid #ccc;
-  border-radius: 0.375rem;
-  background-color: #f8f9fa;
-  color: #333;
+  font-size: var(--font-size);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--light-gray);
+  color: var(--text-color);
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
 }
 
 .button-base:hover {
-  background-color: #e2e6ea;
+  background-color: var(--light-gray-hover);
 }
 
 .filter-button {
@@ -74,43 +231,43 @@ h1 {
 }
 
 .gray-btn {
-  border: 1px solid #6c757d;
-  background-color: #6c757d;
-  color: white;
+  border: var(--border-width) solid var(--gray-border);
+  background-color: var(--gray);
+  color: var(--alt-text-color);
 }
 
 .gray-btn:hover {
-  background-color: #5a6268;
+  background-color: var(--gray-hover);
 }
 
 .green-btn {
-  border: 1px solid #198754;
-  background-color: #198754;
-  color: white;
+  border: var(--border-width) solid var(--green-border);
+  background-color: var(--green);
+  color: var(--alt-text-color);
 }
 
 .green-btn:hover {
-  background-color: #157347;
+  background-color: var(--green-hover);
 }
 
 .blue-btn {
-  border: 1px solid #0d6efd;
-  background-color: #0d6efd;
-  color: white;
+  border: var(--border-width) solid var(--blue-border);
+  background-color: var(--blue);
+  color: var(--alt-text-color);
 }
 
 .blue-btn:hover {
-  background-color: #0b5ed7;
+  background-color: var(--blue-hover);
 }
 
 .red-btn {
-  border: 1px solid #dc3545;
-  background-color: #dc3545;
-  color: white;
+  border: var(--border-width) solid var(--red-border);
+  background-color: var(--red);
+  color: var(--alt-text-color);
 }
 
 .red-btn:hover {
-  background-color: #c82333;
+  background-color: var(--red-hover);
 }
 
 .filters {
@@ -125,9 +282,11 @@ h1 {
   padding: .5rem;
   flex: 1;
   min-width: 150px;
-  font-size: 0.875rem;
-  border: 1px solid #ccc;
-  border-radius: 0.375rem;
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--html-bg);
+  color: var(--text-color-light);
+  font-size: var(--font-size);
 }
 
 .multi-filter {
@@ -137,12 +296,7 @@ h1 {
 }
 
 .multi-filter-toggle {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
   border: 0;
-  border-radius: 0.375rem;
-  background-color: #fff;
-  cursor: pointer;
   width: 100%;
   height: 100%;
 }
@@ -152,9 +306,9 @@ h1 {
   top: 100%;
   left: 0;
   margin-top: 0.25rem;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 0.375rem;
+  background: var(--background-light);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius);
   padding: 0.5rem;
   z-index: 2000;
   display: flex;
@@ -165,21 +319,22 @@ h1 {
 }
 
 #searchInput {
-  flex: 5;
+  flex: 4;
 }
 
 #returnTypeInput {
-  flex: 3;
+  flex: 2;
 }
 
 .count-display {
   margin-top: 0.625rem;
   font-size: 1.25rem; 
-  color: #222;
   padding: 5px;
-  background-color: #f8f9fa;
-  border: 0.0625rem solid #dee2e6;
-  border-radius: 0.25rem;
+  background-color: var(--background-light);
+  border: var(--border-width) solid var(--border-color);
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  border-bottom: 0;
   display: inline-block;
 }
 
@@ -191,10 +346,10 @@ h1 {
 .usage-window {
   position: fixed;
   width: 600px;
-  max-height: 60vh;
-  background-color: white;
-  border: 0.0625rem solid #ddd;
-  border-radius: 0.25rem;
+  max-height: 80vh;
+  background-color: var(--background-light);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius);
   box-shadow: 0 0.125rem 0.625rem rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
@@ -227,10 +382,10 @@ h1 {
 }
 
 .window-header {
-  background-color: #f0f0f0;
+  background-color: var(--background-alt);
   padding: 0.625rem 0.9375rem;
   cursor: move;
-  border-bottom: 0.0625rem solid #ddd;
+  border-bottom: var(--border-width) solid var(--border-color);
   font-weight: bold;
   display: flex;
   justify-content: space-between;
@@ -255,7 +410,8 @@ h1 {
 
 .usage-item {
   padding: 0.5rem 0.75rem;
-  border-bottom: 0.0625rem solid #eee;
+  border-left: var(--border-width-lg) solid rgba(0, 0, 0, 0);
+  border-bottom: var(--border-width) solid var(--border-color-lighter);
   font-family: monospace;
   font-size: .8rem;
   display: flex;
@@ -276,16 +432,16 @@ h1 {
 }
 
 .no-usages {
-  color: #666;
+  color: var(--text-color-light);
   font-style: italic;
 }
 
 .copy-btn {
-  background-color: #f0f0f0;
-  border: 0.0625rem solid #ddd;
+  background-color: var(--background-alt);
+  border: var(--border-width) solid var(--border-color-light);
   border-radius: 0.25rem;
   cursor: pointer;
-  color: #555;
+  color: var(--text-color-light);
   width: 1.75rem;
   height: 1.75rem;
   display: flex;
@@ -298,28 +454,28 @@ h1 {
 }
 
 .copy-btn:hover {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: var(--background-alt-hover);
+  color: var(--text-color);
 }
 
 .copy-btn:active {
-  background-color: #d0d0d0;
+  background-color: var(--background-alt-active);
 }
 
 .copy-btn::before {
-  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'%3E%3C/path%3E%3C/svg%3E");
+  content: var(--copy-icon);
   display: inline-block;
   vertical-align: middle;
 }
 
 .copy-btn.copy-flash::before {
   content: "✓";
-  color: green;
+  color: var(--green);
 }
 
 .copy-btn.copy-error::before {
   content: "✗";
-  color: red;
+  color: var(--red);
 }
 
 .link-btn {
@@ -342,7 +498,7 @@ h1 {
 .usage-section h4 {
   margin: 0 0 0.5rem 0;
   padding-bottom: 0.25rem;
-  border-bottom: 0.0625rem solid #eee;
+  border-bottom: var(--border-width) solid var(--border-color-light);
   color: #555;
 }
 
@@ -361,7 +517,7 @@ h1 {
     box-shadow: none !important;
     resize: none !important;
     margin: 0 !important;
-    background-color: white;
+    background-color: var(--background-light) !important;
     z-index: 1000; /* above everything */
   }
   /* hide the resize handle on mobile */
@@ -375,15 +531,13 @@ h1 {
 }
 
 .mono-only {
-  background-color: rgba(213, 245, 227, 0.3);
-  border-left: 3px solid #0f5132;
-  padding-left: 5px;
+  background-color: var(--alt-green);
+  border-left: var(--border-width-lg) solid var(--green);
 }
 
 .xref-only {
-  background-color: rgba(255, 231, 217, 0.3);
-  border-left: 3px solid #0f5132;
-  padding-left: 5px;
+  background-color: var(--alt-red);
+  border-left: var(--border-width-lg) solid var(--red);
 }
 
 .section-header {
@@ -397,7 +551,7 @@ h1 {
 
 .section-header h4 {
   margin: 0;
-  color: #555;
+  color: var(--text-color-light);
 }
 
 .header-btn {
@@ -411,7 +565,7 @@ h1 {
   align-items: center;
   justify-content: center;
   font-size: .75rem;
-  color: #666;
+  color: var(--text-color-light);
 }
 
 #advWindow {
@@ -431,17 +585,13 @@ h1 {
 }
 
 .toggle-button.toggled {
-  background-color: #198754;
+  background-color: var(--green);
   color: white;
-  border-color: #198754;
-}
-
-.toggle-button:hover {
-  background-color: #e2e6ea;
+  border-color: var(--green);
 }
 
 .toggle-button.toggled:hover {
-  background-color: #157347;
+  background-color: var(--green-hover);
 }
 
 .section-content {
@@ -450,16 +600,16 @@ h1 {
 }
 
 .section-header:hover {
-  background-color: #f8f9fa;
+  background-color: var(--background-light-hover);
 }
 
 .header-btn:hover {
-  color: #333;
+  color: var(--text-color);
 }
 
 @keyframes copyFlash {
-  0% { color: green; }
-  100% { color: #666; }
+  0% { color: var(--green); }
+  100% { color: var(--text-color-light); }
 }
 
 .copy-flash {
@@ -469,21 +619,21 @@ h1 {
 .virtual-table {
   min-width: 75rem;
   max-height: 65vh;
-  border: 0.0625rem solid #ddd;
-  background: white;
+  border: var(--border-width) solid var(--border-color-light);
+  background: var(--background-light);
   display: flex;
   flex-direction: column;
-  font-size: .875rem;
+  font-size: var(--font-size);
 }
 
 .virtual-header {
   display: flex;
-  background: #f0f0f0;
+  background: var(--background-alt);
   font-weight: bold;
   position: sticky;
   top: 0;
   z-index: 5;
-  border-bottom: 0.0625rem solid #ddd;
+  border-bottom: 0.0625rem solid var(--border-color-light);
 }
 
 .virtual-header .cell.sort-asc::before {
@@ -513,15 +663,15 @@ h1 {
 
 .row {
   display: flex;
-  border-top: 0.0625rem solid #ddd;
+  border-top: var(--border-width) solid var(--border-color-light);
   padding: 0 0;
   cursor: pointer;
-  background: white;
+  background: var(--background-light);
   align-items: stretch;
 }
 
 .row:hover {
-  background-color: #f5f5f5;
+  background-color: var(--background-light-hover);
 }
 
 .cell {
@@ -532,7 +682,7 @@ h1 {
   flex-grow: 1;
   flex-shrink: 0;
   align-items: center;
-  border-right: 0.0625rem solid #ddd;
+  border-right: var(--border-width) solid var(--border-color-light);
   cursor: pointer;
 }
 
@@ -571,7 +721,7 @@ h1 {
 
 .filename-text {
   font-size: 0.875rem;
-  color: #555;
+  color: var(--text-color-light);
   margin-left: 0.5rem;
 }
 
@@ -581,13 +731,13 @@ h1 {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(13, 110, 253, 0.1); /* subtle blue */
+  background: rgba(13, 110, 253, 0.1);
   border: 3px dashed #0d6efd;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  pointer-events: none; /* inactive by default */
+  pointer-events: none;
   opacity: 0;
   transition: opacity 0.2s ease;
 }
@@ -605,12 +755,7 @@ h1 {
   border-radius: 0.5rem;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
-
-.hidden {
-  display: none;
-}
   </style>
-  <link rel="stylesheet" href="il2cpp_dark.css" />
 </head>
 <body>
   <h1>IL2CPP Mono Methods Analyzer</h1>
@@ -618,14 +763,14 @@ h1 {
     <label for="fileInput" class="button-base">📁 Choose JSON File<input type="file" id="fileInput" accept="application/json" hidden /></label>
     <button type="button" class="button-base blue-btn" id="loadOnlineBtn">🌐 Load Latest Online JSON</button>
     <span id="selectedFileName" class="filename-text"></span>
-    <!-- <button id="toggleThemeBtn" class="button-base">🌓 Toggle Theme</button> -->
+    <button id="toggleThemeBtn" class="button-base">🌓 Toggle Theme</button>
   </div>
   
   <div class="filters">
     <input class="filter-items" type="text" id="searchInput" placeholder="Search methods..." />
     <input class="filter-items" type="text" id="returnTypeInput" placeholder="Search return types..." />
 
-    <button type="button" id="advSearch" class="button-base filter-items blue-btn">⚙️ Method Filter</button>
+    <button type="button" id="advSearch" class="button-base filter-button blue-btn">⚙️ Method Filter</button>
 
     <div class="break"></div>
 
@@ -642,7 +787,7 @@ h1 {
     <input class="filter-items" type="number" id="minXrefCount" placeholder="Min Xref Count" min="0" />
 
     <div class="filter-items multi-filter" id="tagFilter">
-      <button type="button" class="multi-filter-toggle" id="tagFilterToggle">Filter Tags ▾</button>
+      <button type="button" class="button-base multi-filter-toggle" id="tagFilterToggle">Filter Tags ▾</button>
       <div class="multi-filter-dropdown hidden" id="tagFilterDropdown">
         <button type="button" class="button-base toggle-button toggled" data-filter="inlined">
           <span class="checkbox-icon">✔</span>
@@ -664,7 +809,7 @@ h1 {
     </div>
 
     <div class="filter-items multi-filter" id="typeFilter">
-      <button type="button" class="multi-filter-toggle" id="typeFilterToggle">Filter Types ▾</button>
+      <button type="button" class="button-base multi-filter-toggle" id="typeFilterToggle">Filter Types ▾</button>
       <div class="multi-filter-dropdown hidden" id="typeFilterDropdown">
         <button type="button" class="button-base toggle-button toggled" data-filter="Method">
           <span class="checkbox-icon">✔</span>
@@ -747,6 +892,25 @@ setupTable();
 setupFileInput();
 setupAdvancedMethodWindow();
 
+// Theme toggle functionality
+const savedTheme = localStorage.getItem("theme");
+const html = document.documentElement;
+
+if (savedTheme) {
+  html.setAttribute("data-theme", savedTheme);
+}
+if (!savedTheme) {
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  html.setAttribute("data-theme", prefersDark ? "dark" : "light");
+}
+
+document.getElementById("toggleThemeBtn").addEventListener("click", () => {
+  const current = html.getAttribute("data-theme");
+  const newTheme = current === "dark" ? "light" : "dark";
+  html.setAttribute("data-theme", newTheme);
+  localStorage.setItem("theme", newTheme);
+});
+
 // setup advanced method filter window
 function setupAdvancedMethodWindow() {
   document.getElementById("advMethodApply").addEventListener("click", () => {
@@ -805,12 +969,7 @@ function setupTable(){
   // toggle buttons
   document.querySelectorAll(".toggle-button").forEach(btn => {
     btn.addEventListener("click", () => {
-      btn.classList.toggle("toggled");
-      if (btn.classList.contains("toggled")) {
-        btn.querySelector(".checkbox-icon").textContent = "✔";
-      } else {
-        btn.querySelector(".checkbox-icon").textContent = "✖";
-      }
+      toggleButtonState(btn);
       renderVirtualTable();
     });
   });
@@ -957,6 +1116,12 @@ function renderVirtualTable() {
     visibleEntries.sort((a, b) => {
       const valA = a[sortField];
       const valB = b[sortField];
+
+      if (sortField === "tags") {
+        const valA = a.tags.join(", ");
+        const valB = b.tags.join(", ");
+      }
+
       if (valA < valB) return sortAsc ? -1 : 1;
       if (valA > valB) return sortAsc ? 1 : -1;
       return 0;
@@ -1125,8 +1290,6 @@ function createUsageWindow(methodName) {
   showDiffsToggle.prepend("\n");
   showDiffsToggle.prepend(showDiffsCheck);
 
-  let showDiffsOnly = false;
-
   body.prepend(showDiffsToggle);
   
   const monoSection = createUsageSection(
@@ -1146,9 +1309,8 @@ function createUsageWindow(methodName) {
   body.append(xrefSection);
 
   showDiffsToggle.addEventListener("click", () => {
-    showDiffsOnly = !showDiffsOnly;
-    showDiffsToggle.classList.toggle("toggled", showDiffsOnly);
-    showDiffsToggle.querySelector(".checkbox-icon").textContent = showDiffsOnly ? "✔" : "✖";
+    toggleButtonState(showDiffsToggle);
+    const showDiffsOnly = showDiffsToggle.classList.contains("toggled");
 
     let monoCount = 0;
     let xrefCount = 0;
@@ -1368,6 +1530,13 @@ function setupWindowResize(element, handle) {
   handle.addEventListener('mousedown', initResize);
 }
 
+// toggles a toggle button
+function toggleButtonState(button) {
+  button.classList.toggle("toggled");
+  const icon = button.querySelector(".checkbox-icon");
+  if (icon) icon.textContent = button.classList.contains("toggled") ? "✔" : "✖";
+}
+
 // updates the count display with the current filtered and total counts.
 function updateCountDisplay() {
   document.getElementById("countDisplay").textContent = `${filteredCount}/${totalCount}`;
@@ -1452,25 +1621,6 @@ function loadFile(file) {
   document.getElementById("selectedFileName").textContent = file ? file.name : "";
 }
 
-/* dark theme WIP
-const savedTheme = localStorage.getItem("theme");
-const html = document.documentElement;
-
-if (savedTheme) {
-  html.setAttribute("data-theme", savedTheme);
-}
-if (!savedTheme) {
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  html.setAttribute("data-theme", prefersDark ? "dark" : "light");
-}
-
-document.getElementById("toggleThemeBtn").addEventListener("click", () => {
-  const current = html.getAttribute("data-theme");
-  const newTheme = current === "dark" ? "light" : "dark";
-  html.setAttribute("data-theme", newTheme);
-  localStorage.setItem("theme", newTheme);
-});
-*/
 </script>
 </body>
 </html>
