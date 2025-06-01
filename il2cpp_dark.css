@@ -1,0 +1,43 @@
+[data-theme="dark"] {
+    background-color: #121212;
+    color: #f1f1f1;
+    border-color: #333;
+}
+
+[data-theme="dark"] body {
+    background-color: #121212;
+    color: #f1f1f1;
+}
+
+[data-theme="dark"] .virtual-table {
+    background-color: #1e1e1e;
+}
+
+[data-theme="dark"] .cell {
+    background-color: #2a2a2a;
+    border-color: #333;
+}
+
+[data-theme="dark"] .tag-red {
+    background-color: #ff6b6b;
+    color: #fff;
+}
+
+[data-theme="dark"] .toggle-button.toggled {
+    background-color: #198754;
+    color: white;
+}
+
+[data-theme="dark"] .usage-window {
+    background-color: #1f1f1f;
+    color: #eee;
+    border-color: #333;
+}
+
+[data-theme="dark"] .window-body {
+    background-color: #1f1f1f;
+}
+
+[data-theme="dark"] .row {
+    border-color: #444;
+}

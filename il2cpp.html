@@ -12,7 +12,12 @@ body {
 }
 
 h1 {
+  margin-top:0;
   margin-bottom: 0.625rem;
+}
+
+.spacer {
+  flex: 1;
 }
 
 .tag {
@@ -24,13 +29,13 @@ h1 {
 }
 
 .inlined {
-  background-color: #d1e7dd;
-  color: #0f5132;
+  background-color: #f5c2c7;
+  color: #842029;
 }
 
 .used-by-inline {
-  background-color: #f8d7da;
-  color: #856404;
+  background-color: #fff3cd;
+  color: #842029;
 }
 
 .stripped {
@@ -48,9 +53,64 @@ h1 {
   font-weight: bold;
 }
 
-.flagged {
-  background-color: #fff3cd;
-  color: #842029;
+.button-base {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  background-color: #f8f9fa;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.button-base:hover {
+  background-color: #e2e6ea;
+}
+
+.filter-button {
+  min-width: 8rem;
+  flex: 1;
+}
+
+.gray-btn {
+  border: 1px solid #6c757d;
+  background-color: #6c757d;
+  color: white;
+}
+
+.gray-btn:hover {
+  background-color: #5a6268;
+}
+
+.green-btn {
+  border: 1px solid #198754;
+  background-color: #198754;
+  color: white;
+}
+
+.green-btn:hover {
+  background-color: #157347;
+}
+
+.blue-btn {
+  border: 1px solid #0d6efd;
+  background-color: #0d6efd;
+  color: white;
+}
+
+.blue-btn:hover {
+  background-color: #0b5ed7;
+}
+
+.red-btn {
+  border: 1px solid #dc3545;
+  background-color: #dc3545;
+  color: white;
+}
+
+.red-btn:hover {
+  background-color: #c82333;
 }
 
 .filters {
@@ -62,8 +122,7 @@ h1 {
 }
 
 .filter-items {
-  padding: 0.625rem;
-  box-sizing: border-box;
+  padding: .5rem;
   flex: 1;
   min-width: 150px;
   font-size: 0.875rem;
@@ -103,38 +162,6 @@ h1 {
   gap: 0.25rem;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   min-width: 100px;
-}
-
-.multi-filter-button {
-  width: 100%;
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
-  border: 1px solid #ccc;
-  border-radius: 0.375rem;
-  background-color: #f8f9fa;
-  color: #333;
-  cursor: pointer;
-  margin-right: 0.25rem;
-  margin-bottom: 0.25rem;
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.multi-filter-button.toggled {
-  background-color: #198754;
-  color: white;
-  border-color: #198754;
-}
-
-.multi-filter-button.toggled:hover {
-  background-color: #157347;
-}
-
-.multi-filter-button:hover {
-  background-color: #e2e6ea;
-}
-
-.multi-filter-dropdown.hidden {
-  display: none;
 }
 
 #searchInput {
@@ -177,7 +204,7 @@ h1 {
   resize: both;
   overflow: hidden;
   min-width: 300px;
-  min-height: 200px;
+  min-height: 300px;
 }
 
 .usage-window::-webkit-resizer {
@@ -259,8 +286,8 @@ h1 {
   border-radius: 0.25rem;
   cursor: pointer;
   color: #555;
-  width: 28px;
-  height: 28px;
+  width: 1.75rem;
+  height: 1.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -301,7 +328,6 @@ h1 {
   cursor: pointer;
   background: none;
   border: none;
-  color: #198754; /* match your green */
   padding: 0;
 }
 
@@ -388,35 +414,9 @@ h1 {
   color: #666;
 }
 
-.adv-button {
-  font-size: 0.875rem;
-  border: 1px solid #0d6efd;
-  border-radius: 0.375rem;
-  border-color: #0d6efd;
-  background-color: #0d6efd;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
-  flex:1;
-}
-
 #advWindow {
   width: 400px;
   height: 500px;
-}
-
-#advWindow .adv-button {
-  max-height: 2.5rem;
-}
-
-.adv-button:hover {
-  background-color: #0b5ed7;
-  color: white;
-}
-
-.adv-button:active {
-  background-color: #0a58ca;
-  color: white;
 }
 
 .adv-window-body {
@@ -427,17 +427,7 @@ h1 {
 
 .adv-window-body textarea {
   flex:5;
-}
-
-.toggle-button {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
-  border: 1px solid #ccc;
-  border-radius: 0.375rem;
-  background-color: #f8f9fa;
-  color: #333;
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  resize: none;
 }
 
 .toggle-button.toggled {
@@ -453,7 +443,6 @@ h1 {
 .toggle-button.toggled:hover {
   background-color: #157347;
 }
-
 
 .section-content {
   padding-left: 1.25rem;
@@ -478,7 +467,7 @@ h1 {
 }
 
 .virtual-table {
-  min-width: 1000px;
+  min-width: 75rem;
   max-height: 65vh;
   border: 0.0625rem solid #ddd;
   background: white;
@@ -563,43 +552,91 @@ h1 {
   bottom: 1rem;
   right: 1rem;
   z-index: 10;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  background-color: #0d6efd;
-  color: white;
   border: none;
-  border-radius: 0.375rem;
-  cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   transition: opacity 0.3s ease;
-}
-
-.back-to-top-btn:hover {
-  background-color: #0b5ed7;
 }
 
 .hidden {
   display: none;
 }
 
+.upload-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.filename-text {
+  font-size: 0.875rem;
+  color: #555;
+  margin-left: 0.5rem;
+}
+
+.full-drop-zone {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(13, 110, 253, 0.1); /* subtle blue */
+  border: 3px dashed #0d6efd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none; /* inactive by default */
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.full-drop-zone.active {
+  pointer-events: all;
+  opacity: 1;
+}
+
+.drop-zone-message {
+  font-size: 1.25rem;
+  color: #0d6efd;
+  background: white;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.hidden {
+  display: none;
+}
   </style>
+  <link rel="stylesheet" href="il2cpp_dark.css" />
 </head>
 <body>
   <h1>IL2CPP Mono Methods Analyzer</h1>
   <div class="upload-inputs">
-    <input type="file" id="fileInput" accept="application/json" />
-    <button type="button" onclick="loadOnline()">Load Latest Online JSON</button>
+    <label for="fileInput" class="button-base">📁 Choose JSON File<input type="file" id="fileInput" accept="application/json" hidden /></label>
+    <button type="button" class="button-base blue-btn" id="loadOnlineBtn">🌐 Load Latest Online JSON</button>
+    <span id="selectedFileName" class="filename-text"></span>
+    <!-- <button id="toggleThemeBtn" class="button-base">🌓 Toggle Theme</button> -->
   </div>
+  
   <div class="filters">
     <input class="filter-items" type="text" id="searchInput" placeholder="Search methods..." />
     <input class="filter-items" type="text" id="returnTypeInput" placeholder="Search return types..." />
 
-    <button type="button" id="advSearch" class="filter-items adv-button">Adv. Filter</button>
+    <button type="button" id="advSearch" class="button-base filter-items blue-btn">⚙️ Method Filter</button>
 
     <div class="break"></div>
 
-    <button id="showCompilerGenerated" class="filter-items toggle-button toggled">Toggle Compiler Generated Methods</button>
-    <button id="generic" class="filter-items toggle-button toggled">Toggle Generic Methods</button>
+    <button id="showCompilerGenerated" class="button-base filter-button toggle-button toggled">
+      <span class="checkbox-icon">✔</span>
+      Compiler Generated Methods
+    </button>
+    <button id="generic" class="button-base filter-button toggle-button toggled">
+      <span class="checkbox-icon">✔</span>
+      Generic Methods
+    </button>
 
     <input class="filter-items" type="number" id="minMonoCount" placeholder="Min Mono Count" min="0" />
     <input class="filter-items" type="number" id="minXrefCount" placeholder="Min Xref Count" min="0" />
@@ -607,19 +644,36 @@ h1 {
     <div class="filter-items multi-filter" id="tagFilter">
       <button type="button" class="multi-filter-toggle" id="tagFilterToggle">Filter Tags ▾</button>
       <div class="multi-filter-dropdown hidden" id="tagFilterDropdown">
-        <button type="button" class="multi-filter-button toggled" data-filter="inlined">Inlined</button>
-        <button type="button" class="multi-filter-button toggled" data-filter="used-by-inline">Used by Inlined</button>
-        <button type="button" class="multi-filter-button toggled" data-filter="stripped">Stripped</button>
-        <button type="button" class="multi-filter-button toggled" data-filter="matched">Matched</button>
-        <button type="button" class="multi-filter-button toggled" data-filter="flagged">Flagged</button>
+        <button type="button" class="button-base toggle-button toggled" data-filter="inlined">
+          <span class="checkbox-icon">✔</span>
+          Inlined
+        </button>
+        <button type="button" class="button-base toggle-button toggled" data-filter="used-by-inline">
+          <span class="checkbox-icon">✔</span>
+          Used by Inlined
+        </button>
+        <button type="button" class="button-base toggle-button toggled" data-filter="stripped">
+          <span class="checkbox-icon">✔</span>
+          Stripped
+        </button>
+        <button type="button" class="button-base toggle-button toggled" data-filter="matched">
+          <span class="checkbox-icon">✔</span>
+          Matched
+        </button>
       </div>
     </div>
 
     <div class="filter-items multi-filter" id="typeFilter">
       <button type="button" class="multi-filter-toggle" id="typeFilterToggle">Filter Types ▾</button>
       <div class="multi-filter-dropdown hidden" id="typeFilterDropdown">
-        <button type="button" class="multi-filter-button toggled" data-filter="Method">Method</button>
-        <button type="button" class="multi-filter-button toggled" data-filter="Property">Property</button>
+        <button type="button" class="button-base toggle-button toggled" data-filter="Method">
+          <span class="checkbox-icon">✔</span>
+          Method
+        </button>
+        <button type="button" class="button-base toggle-button toggled" data-filter="Property">
+          <span class="checkbox-icon">✔</span>
+          Property
+        </button>
       </div>
     </div>
   </div>
@@ -628,9 +682,9 @@ h1 {
     <div class="virtual-table">
       <div class="virtual-header">
         <div class="cell col-method" data-sort="method">Method</div>
-        <div class="cell col-return" data-sort="ReturnType">Return Type</div>
-        <div class="cell col-count" data-sort="MonoCount">Mono Count</div>
-        <div class="cell col-count" data-sort="XrefCount">Xref Count</div>
+        <div class="cell col-return" data-sort="returnType">Return Type</div>
+        <div class="cell col-count" data-sort="monoCount">Mono Count</div>
+        <div class="cell col-count" data-sort="xrefCount">Xref Count</div>
         <div class="cell col-type" data-sort="type">Type</div>
         <div class="cell col-tag" data-sort="tag">Tag</div>
       </div>    
@@ -647,12 +701,16 @@ h1 {
     </div>
     <div class="adv-window-body window-body">
       <textarea spellcheck="false" id="advMethodInput" rows="5" placeholder="Enter method names, one per line..."></textarea>
-      <button id="advMethodApply" class="adv-button">Apply Filter</button>
-      <button id="advMethodClear" class="adv-button">Clear Filter</button>
+      <button id="advMethodApply" class="button-base blue-btn">Apply Filter</button>
+      <button id="advMethodClear" class="button-base red-btn">Clear Filter</button>
     </div>
     <div class="resize-handle"></div>
   </div>
-  <script> 
+  <div id="fullDropZone" class="full-drop-zone">
+    <div class="drop-zone-message">📁 Drop your JSON file to load</div>
+  </div>  
+  <script>
+// method data
 let methodData = {};
 let allEntries = [];
 let visibleEntries = [];
@@ -660,61 +718,217 @@ let sortField = null;
 let sortAsc = true;
 let advancedMethodLines = [];
 
-const openWindows = new Set();
+// DOM elements
+const fullDropZone = document.getElementById("fullDropZone");
+const advWindow = document.getElementById("advWindow");
 
+// Table stuff
 let rowHeights = [];
 let totalHeight = 0;
 let scrollTop = 0;
 
+// windows stuff
+const openWindows = new Set();
+let dragCounter = 0;
+
+// tagging methods
+const visibleTags = {
+  "inlined": "Potentially Inlined",
+  "used-by-inline": "Used by Inlined methods",
+  "stripped": "Stripped",
+  "matched": "Matched",
+}
+
+// Z indexing
 let currentZ = 500;
+
+// setup the initial state
+setupTable();
+setupFileInput();
+setupAdvancedMethodWindow();
+
+// setup advanced method filter window
+function setupAdvancedMethodWindow() {
+  document.getElementById("advMethodApply").addEventListener("click", () => {
+    const input = document.getElementById("advMethodInput").value.trim();
+    advancedMethodLines = input ? input.split(/\r?\n/).map(line => line.trim()).filter(line => line) : [];
+    renderVirtualTable();
+  });
+
+  advWindow.querySelector('.window-close').addEventListener('click', () => {
+    advWindow.classList.add("hidden");
+  });
+
+  document.getElementById("advSearch").addEventListener("click", () => {
+    advWindow.classList.toggle("hidden");
+  });
+
+  document.getElementById("advMethodClear").addEventListener("click", () => {
+    document.getElementById("advMethodInput").value = '';
+    advancedMethodLines = [];
+    renderVirtualTable();
+  });
+
+  setupWindowDrag(advWindow);
+  setupWindowResize(advWindow, advWindow.querySelector('.resize-handle'));
+}
+
+// setup necessary listeners for virtual table and filtering
+function setupTable(){
+
+  // multi-toggle dropdowns
+  document.addEventListener('click', (e) => {
+    document.querySelectorAll('.multi-filter-dropdown').forEach(dropdown => {
+      if (!dropdown.contains(e.target) && !dropdown.previousElementSibling.contains(e.target)) {
+        dropdown.classList.add('hidden');
+      }
+    });
+  });
+
+  document.querySelectorAll('.multi-filter').forEach(filter => {
+    filter.querySelector('.multi-filter-toggle').addEventListener('click', (e) => {
+      filter.querySelector('.multi-filter-dropdown').classList.toggle('hidden');
+    });
+  });
+
+  // scroll
+  document.getElementById("virtual-viewport").addEventListener("scroll", renderVisibleRows);
+
+  // filters
+  document.getElementById("searchInput").addEventListener("input", renderVirtualTable);
+  document.getElementById("returnTypeInput").addEventListener("input", renderVirtualTable);
+  document.getElementById("showCompilerGenerated").addEventListener("change", renderVirtualTable);
+  document.getElementById("generic").addEventListener("change", renderVirtualTable);
+  document.getElementById("minMonoCount").addEventListener("input", renderVirtualTable);
+  document.getElementById("minXrefCount").addEventListener("input", renderVirtualTable);
+
+  // toggle buttons
+  document.querySelectorAll(".toggle-button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      btn.classList.toggle("toggled");
+      if (btn.classList.contains("toggled")) {
+        btn.querySelector(".checkbox-icon").textContent = "✔";
+      } else {
+        btn.querySelector(".checkbox-icon").textContent = "✖";
+      }
+      renderVirtualTable();
+    });
+  });
+
+  // multi-filter toggles
+  document.querySelectorAll('.multi-filter-button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('toggled');
+      renderVirtualTable();
+    });
+  });
+
+  // sorting
+  document.querySelectorAll(".virtual-header .cell").forEach(th => {
+    th.addEventListener("click", () => {
+      const field = th.dataset.sort;
+      if (sortField === field) {
+        sortAsc = !sortAsc;
+      } else {
+        sortField = field;
+        sortAsc = true;
+      }
+      
+      document.querySelectorAll(".virtual-header .cell").forEach(cell => {
+        cell.classList.remove("sort-asc", "sort-desc");
+      });
+
+      th.classList.add(sortAsc ? "sort-asc" : "sort-desc");
+
+      renderVirtualTable();
+    });
+  });
+}
+
+// setup file loading
+function setupFileInput() {
+  document.getElementById("fileInput").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    loadFile(file);
+  });
+
+  document.getElementById("loadOnlineBtn").addEventListener("click", (e) => {
+    fetch("method_analysis_results.json")
+      .then(response => response.json())
+      .then(data => {
+        loadJson(data);
+        document.getElementById("selectedFileName").textContent = "method_analysis_results.json (Online)";
+      })
+      .catch(err => {
+        alert("Failed to load online JSON");
+        console.error(err);
+      });
+  })
+
+  window.addEventListener("dragenter", (e) => {
+    e.preventDefault();
+    dragCounter++;
+    fullDropZone.classList.add("active");
+  });
+
+  window.addEventListener("dragleave", (e) => {
+    dragCounter--;
+    if (dragCounter === 0) {
+      fullDropZone.classList.remove("active");
+    }
+  });
+
+  window.addEventListener("dragover", (e) => {
+    e.preventDefault();
+  });
+
+  window.addEventListener("drop", (e) => {
+    e.preventDefault();
+    fullDropZone.classList.remove("active");
+    dragCounter = 0;
+
+    const file = e.dataTransfer.files[0];
+    if (!file || file.type !== "application/json") {
+      alert("Please drop a valid JSON file.");
+      return;
+    }
+    loadFile(file);
+  });
+}
+
+// gets next Z index for ordering windows.
 function getNextZIndex() {
   return ++currentZ;
 }
 
+// updates the entries list when a new JSON is loaded.
 function updateDatasetFromJson() {
   allEntries = Object.entries(methodData).map(([method, data]) => {
-    let tag = "Matched";
-    let tagClass = "matched";
-    if (data.MonoCount > data.XrefCount) {
-      tag = "Potentially Inlined";
-      tagClass = "inlined";
-    } else if (data.XrefCount > data.MonoCount) {
-      tag = "Potentially used by Inlined method";
-      tagClass = "used-by-inline";
-    } else if (data.IsFlagged) {
-      tag = "Flagged";
-      tagClass = "flagged";
-    }
-    if (data.IsStripped) {
-      tag = "Potentially Stripped";
-      tagClass = "stripped";
-    }
-
     return {
       method,
-      ReturnType: data.ReturnType,
-      MonoCount: data.MonoCount,
-      XrefCount: data.XrefCount,
-      CompilerGenerated: data.IsCompilerGenerated,
-      Generic: data.IsGeneric,
-      type: data.IsProperty ? "Property" : "Method",
-      tag,
-      tagClass
+      returnType: data.ReturnType,
+      monoCount: data.MonoCount,
+      xrefCount: data.XrefCount,
+      type: data.Type || "Method",
+      tags: data.Tags || []
     };
   });
 
   renderVirtualTable();
 }
 
+// calculates filters and renders the table.
 function renderVirtualTable() {
   const filter = document.getElementById("searchInput").value.trim().toLowerCase();
   const returnTypeFilter = document.getElementById("returnTypeInput").value.trim().toLowerCase();
 
-  const selectedTags = Array.from(document.querySelectorAll('#tagFilter .multi-filter-button.toggled')).map(btn => btn.dataset.filter);
-  const typeFilter = Array.from(document.querySelectorAll('#typeFilter .multi-filter-button.toggled')).map(btn => btn.dataset.filter);
+  const selectedTags = Array.from(document.querySelectorAll('#tagFilter .toggle-button.toggled')).map(btn => btn.dataset.filter);
+  const typeFilter = Array.from(document.querySelectorAll('#typeFilter .toggle-button.toggled')).map(btn => btn.dataset.filter);
 
   const showCompilerGenerated = document.getElementById("showCompilerGenerated").classList.contains("toggled");
   const generic = document.getElementById("generic").classList.contains("toggled");
+
   const minMono = parseInt(document.getElementById("minMonoCount").value, 10) || 0;
   const minXref = parseInt(document.getElementById("minXrefCount").value, 10) || 0;
 
@@ -725,14 +939,15 @@ function renderVirtualTable() {
     }
 
     const matchesMethod = !filter || entry.method.toLowerCase().includes(filter);
-    const matchesReturn = !returnTypeFilter || (entry.ReturnType.toLowerCase().includes(returnTypeFilter));
-    const matchesTag = selectedTags.length === 0 || selectedTags.includes(entry.tagClass);
+    const matchesReturn = !returnTypeFilter || (entry.returnType.toLowerCase().includes(returnTypeFilter));
+    const matchesTag = selectedTags.length === 0 || selectedTags.some(tag => entry.tags.includes(tag));
     const matchesType = typeFilter.length === 0 || typeFilter.includes(entry.type);
-    const matchesCompilerGenerated = showCompilerGenerated || !entry.CompilerGenerated;
-    const matchesGeneric = generic || !entry.Generic;
-    const matchesMonoCount = entry.MonoCount >= minMono;
-    const matchesXrefCount = entry.XrefCount >= minXref;
+    const matchesCompilerGenerated = showCompilerGenerated || !entry.tags.includes("compiler-generated");
+    const matchesGeneric = generic || !entry.tags.includes("generic");
+    const matchesMonoCount = entry.monoCount >= minMono;
+    const matchesXrefCount = entry.xrefCount >= minXref;
     const matchesMultiMethod = advancedMethodLines.length === 0 || advancedMethodLines.some(startsWith);
+
     return matchesMethod && matchesReturn && matchesTag && matchesType && 
     matchesCompilerGenerated && matchesGeneric && matchesMonoCount && matchesXrefCount
     && matchesMultiMethod;
@@ -762,6 +977,7 @@ function renderVirtualTable() {
   });
 }
 
+// renders visible rows.
 function renderVisibleRows() {
   const container = document.getElementById("virtual-viewport");
   const content = document.getElementById("virtual-content");
@@ -800,13 +1016,22 @@ function renderVisibleRows() {
         <span class="method-name">${highlightMatch(entry.method, document.getElementById("searchInput").value)}</span>
       </div>
       <div class="cell col-return">
-        <span class="return-type">${highlightMatch(entry.ReturnType, document.getElementById("returnTypeInput").value)}</span>
+        <span class="return-type">${highlightMatch(entry.returnType, document.getElementById("returnTypeInput").value)}</span>
       </div>
-      <div class="cell col-count">${entry.MonoCount}</div>
-      <div class="cell col-count">${entry.XrefCount}</div>
+      <div class="cell col-count">${entry.monoCount}</div>
+      <div class="cell col-count">${entry.xrefCount}</div>
       <div class="cell col-type">${entry.type}</div>
-      <div class="cell col-tag"><span class="tag ${entry.tagClass}">${entry.tag}</span></div>
+      <div class="cell col-tag"></div>
     `;
+    const tagCell = row.querySelector(".col-tag");
+    entry.tags.forEach(tag => {
+      if (!visibleTags[tag]) return;
+      const tagSpan = document.createElement("span");
+      tagSpan.classList.add("tag", tag);
+      tagSpan.textContent = visibleTags[tag];
+      tagCell.appendChild(tagSpan);
+    });
+
     const copyBtn = row.querySelector(".copy-btn");
     setupCopyButton(copyBtn, entry.method);
 
@@ -826,8 +1051,7 @@ function renderVisibleRows() {
   }
 }
 
-document.getElementById("virtual-viewport").addEventListener("scroll", renderVisibleRows);
-
+// sets up a copy button with a desired text
 function setupCopyButton(button, textToCopy) {
   button.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -846,6 +1070,7 @@ function setupCopyButton(button, textToCopy) {
   });
 }
 
+// creates a window to display method usages.
 function createUsageWindow(methodName) {
   const method = methodData[methodName];
   if (!method) {
@@ -865,6 +1090,7 @@ function createUsageWindow(methodName) {
   windowEl.className = 'usage-window';
   windowEl.id = windowId;
   windowEl.setAttribute("data-method", methodName);
+  windowEl.style.zIndex = getNextZIndex();
 
   windowEl.addEventListener("mousedown", () => {
     windowEl.style.zIndex = getNextZIndex();
@@ -888,9 +1114,17 @@ function createUsageWindow(methodName) {
   body.className = 'window-body';
 
   const showDiffsToggle = document.createElement("button");
-  showDiffsToggle.className = "toggle-button";
+  showDiffsToggle.classList.add("button-base", "toggle-button");
   showDiffsToggle.textContent = "Show Diffs Only";
   showDiffsToggle.style.marginBottom = "0.75rem";
+
+  const showDiffsCheck = document.createElement("span");
+  showDiffsCheck.classList.add("checkbox-icon");
+  showDiffsCheck.innerHTML = "✖";
+
+  showDiffsToggle.prepend("\n");
+  showDiffsToggle.prepend(showDiffsCheck);
+
   let showDiffsOnly = false;
 
   body.prepend(showDiffsToggle);
@@ -914,7 +1148,7 @@ function createUsageWindow(methodName) {
   showDiffsToggle.addEventListener("click", () => {
     showDiffsOnly = !showDiffsOnly;
     showDiffsToggle.classList.toggle("toggled", showDiffsOnly);
-    showDiffsToggle.textContent = showDiffsOnly ? "Showing Diffs Only" : "Show Diffs Only";
+    showDiffsToggle.querySelector(".checkbox-icon").textContent = showDiffsOnly ? "✔" : "✖";
 
     let monoCount = 0;
     let xrefCount = 0;
@@ -928,11 +1162,11 @@ function createUsageWindow(methodName) {
       item.style.display = showDiffsOnly ? (item.classList.contains('common') ? 'none' : '') : '';
     });
     if (showDiffsOnly) {  
-      monoSection.querySelector('.section-header h4').textContent = `Mono Usages (${monoCount} / ${method.MonoUsages.length})`;
-      xrefSection.querySelector('.section-header h4').textContent = `Xref Usages (${xrefCount} / ${method.XrefUsages.length})`;
+      monoSection.querySelector('.section-header h4').textContent = `Mono Usages (${monoCount} / ${method.monoUsages.length})`;
+      xrefSection.querySelector('.section-header h4').textContent = `Xref Usages (${xrefCount} / ${method.xrefUsages.length})`;
     } else {
-      monoSection.querySelector('.section-header h4').textContent = `Mono Usages (${method.MonoUsages.length})`;
-      xrefSection.querySelector('.section-header h4').textContent = `Xref Usages (${method.XrefUsages.length})`;
+      monoSection.querySelector('.section-header h4').textContent = `Mono Usages (${method.monoUsages.length})`;
+      xrefSection.querySelector('.section-header h4').textContent = `Xref Usages (${method.xrefUsages.length})`;
     }
   });
 
@@ -940,7 +1174,7 @@ function createUsageWindow(methodName) {
   windowEl.append(body);
 
   const backToTopBtn = document.createElement("button");
-  backToTopBtn.className = "back-to-top-btn";
+  backToTopBtn.classList.add("button-base", "blue-btn", "back-to-top-btn");
   backToTopBtn.textContent = "↑ Back to Top";
   backToTopBtn.style.opacity = "0";
   backToTopBtn.disabled = true;
@@ -1061,6 +1295,7 @@ function createUsageWindow(methodName) {
   return windowEl;
 }
 
+// sets up dragging functionality for a window element.
 function setupWindowDrag(windowEl) {
   const header = windowEl.querySelector('.window-header');
   let isDragging = false;
@@ -1106,6 +1341,7 @@ function setupWindowDrag(windowEl) {
   });
 }
 
+// sets up resizing functionality for a window element.
 function setupWindowResize(element, handle) {
   let startX, startY, startWidth, startHeight;
 
@@ -1132,10 +1368,12 @@ function setupWindowResize(element, handle) {
   handle.addEventListener('mousedown', initResize);
 }
 
+// updates the count display with the current filtered and total counts.
 function updateCountDisplay() {
   document.getElementById("countDisplay").textContent = `${filteredCount}/${totalCount}`;
 }
 
+// highlights matching text in a method name based on the filter input.
 function highlightMatch(text, filter) {
   if (!filter) return escapeHTML(text);
 
@@ -1169,12 +1407,14 @@ function highlightMatch(text, filter) {
   return container.innerHTML;
 }
 
+// escapes HTML special characters in a string
 function escapeHTML(str) {
   const div = document.createElement("div");
   div.innerText = str;
   return div.innerHTML;
 }
 
+// debounces a function to limit how often it can be called
 function debounce(func, wait) {
   let timeout;
   return function(...args) {
@@ -1184,120 +1424,53 @@ function debounce(func, wait) {
   };
 }
 
-function loadOnline() {
-  fetch("method_analysis_results.json")
-    .then(response => response.json())
-    .then(data => {
-      methodData = data;
-      updateDatasetFromJson();
-    })
-    .catch(err => {
-      alert("Failed to load online JSON");
-      console.error(err);
-    });
+// loads a JSON object into the methodData variable and updates the dataset.
+function loadJson(json) {
+  try {
+    methodData = json;
+    updateDatasetFromJson();
+  } catch (err) {
+    alert("Invalid JSON format");
+    console.error(err);
+  }
 }
 
-document.getElementById("fileInput").addEventListener("change", function (event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
+// loads a file using FileReader and parses it as JSON.
+function loadFile(file) {
   const reader = new FileReader();
   reader.onload = function (e) {
     try {
-      methodData = JSON.parse(e.target.result);
-      updateDatasetFromJson();
+      const json = JSON.parse(e.target.result);
+      loadJson(json);
     } catch (err) {
       alert("Invalid JSON file");
       console.error(err);
     }
   };
-
+  
   reader.readAsText(file);
+  document.getElementById("selectedFileName").textContent = file ? file.name : "";
+}
+
+/* dark theme WIP
+const savedTheme = localStorage.getItem("theme");
+const html = document.documentElement;
+
+if (savedTheme) {
+  html.setAttribute("data-theme", savedTheme);
+}
+if (!savedTheme) {
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  html.setAttribute("data-theme", prefersDark ? "dark" : "light");
+}
+
+document.getElementById("toggleThemeBtn").addEventListener("click", () => {
+  const current = html.getAttribute("data-theme");
+  const newTheme = current === "dark" ? "light" : "dark";
+  html.setAttribute("data-theme", newTheme);
+  localStorage.setItem("theme", newTheme);
 });
-
-document.querySelectorAll(".toggle-button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    btn.classList.toggle("toggled");
-    renderVirtualTable();
-  });
-});
-
-document.addEventListener('click', (e) => {
-  const filter = document.getElementById('tagFilter');
-  if (!filter.contains(e.target)) {
-    document.querySelector('#tagFilterDropdown').classList.add('hidden');
-  }
-  const typeFilter = document.getElementById('typeFilter');
-  if (!typeFilter.contains(e.target)) {
-    document.querySelector('#typeFilterDropdown').classList.add('hidden');
-  }
-});
-
-document.getElementById("searchInput").addEventListener("input", renderVirtualTable);
-document.getElementById("returnTypeInput").addEventListener("input", renderVirtualTable);
-document.getElementById("showCompilerGenerated").addEventListener("change", renderVirtualTable);
-document.getElementById("generic").addEventListener("change", renderVirtualTable);
-document.getElementById("minMonoCount").addEventListener("input", renderVirtualTable);
-document.getElementById("minXrefCount").addEventListener("input", renderVirtualTable);
-
-document.querySelector('#tagFilterToggle').addEventListener('click', () => {
-  document.querySelector('#tagFilterDropdown').classList.toggle('hidden');
-});
-
-document.querySelector('#typeFilterToggle').addEventListener('click', () => {
-  document.querySelector('#typeFilterDropdown').classList.toggle('hidden');
-});
-
-let advWindow = document.getElementById("advWindow");
-setupWindowDrag(advWindow);
-setupWindowResize(advWindow, advWindow.querySelector('.resize-handle'));
-
-advWindow.querySelector('.window-close').addEventListener('click', () => {
-  advWindow.classList.add("hidden");
-});
-
-document.getElementById("advSearch").addEventListener("click", () => {
-  advWindow.classList.toggle("hidden");
-});
-
-document.getElementById("advMethodApply").addEventListener("click", () => {
-  const input = document.getElementById("advMethodInput").value.trim();
-  advancedMethodLines = input ? input.split(/\r?\n/).map(line => line.trim()).filter(line => line) : [];
-  renderVirtualTable();
-});
-
-document.getElementById("advMethodClear").addEventListener("click", () => {
-  document.getElementById("advMethodInput").value = '';
-  advancedMethodLines = [];
-  renderVirtualTable();
-});
-
-document.querySelectorAll('.multi-filter-button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    btn.classList.toggle('toggled');
-    renderVirtualTable();
-  });
-});
-
-document.querySelectorAll(".virtual-header .cell").forEach(th => {
-  th.addEventListener("click", () => {
-    const field = th.dataset.sort;
-    if (sortField === field) {
-      sortAsc = !sortAsc;
-    } else {
-      sortField = field;
-      sortAsc = true;
-    }
-    
-    document.querySelectorAll(".virtual-header .cell").forEach(cell => {
-      cell.classList.remove("sort-asc", "sort-desc");
-    });
-
-    th.classList.add(sortAsc ? "sort-asc" : "sort-desc");
-
-    renderVirtualTable();
-  });
-});
+*/
 </script>
 </body>
 </html>
