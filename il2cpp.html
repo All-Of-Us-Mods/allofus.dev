@@ -763,6 +763,7 @@ h1 {
   <div class="upload-inputs">
     <label for="fileInput" class="button-base">📁 Choose JSON File<input type="file" id="fileInput" accept="application/json" hidden /></label>
     <button type="button" class="button-base blue-btn" id="loadOnlineBtn">🌐 Load Latest Online JSON</button>
+    <button type="button" class="button-base blue-btn" id="loadOnlineBtnAndroid">🌐 Load Latest (Android)</button>
     <span id="selectedFileName" class="filename-text"></span>
     <button id="toggleThemeBtn" class="button-base">🌓 Toggle Theme</button>
   </div>
@@ -1014,7 +1015,20 @@ function setupFileInput() {
   });
 
   document.getElementById("loadOnlineBtn").addEventListener("click", (e) => {
-    fetch("method_analysis_results.json?v=2")
+    fetch("il2cpp/method_analysis_results.json?v=3")
+      .then(response => response.json())
+      .then(data => {
+        loadJson(data);
+        document.getElementById("selectedFileName").textContent = "method_analysis_results.json (Online)";
+      })
+      .catch(err => {
+        alert("Failed to load online JSON");
+        console.error(err);
+      });
+  })
+
+  document.getElementById("loadOnlineBtnAndroid").addEventListener("click", (e) => {
+    fetch("il2cpp/method_analysis_results_android.json?v=3")
       .then(response => response.json())
       .then(data => {
         loadJson(data);
