@@ -786,7 +786,13 @@ h1 {
     </button>
 
     <input class="filter-items" type="number" id="minMonoCount" placeholder="Min Mono Count" min="0" />
+    <input class="filter-items" type="number" id="maxMonoCount" placeholder="Max Mono Count" />
+
     <input class="filter-items" type="number" id="minXrefCount" placeholder="Min Xref Count" min="0" />
+    <input class="filter-items" type="number" id="maxXrefCount" placeholder="Max Xref Count" />
+
+    <input class="filter-items" type="number" id="minThisCount" placeholder="Min This Count" min="0" />
+    <input class="filter-items" type="number" id="maxThisCount" placeholder="Max This Count" />
 
     <div class="filter-items multi-filter" id="tagFilter">
       <button type="button" class="button-base multi-filter-toggle" id="tagFilterToggle">Filter Tags ▾</button>
@@ -832,6 +838,7 @@ h1 {
         <div class="cell col-return" data-sort="returnType">Return Type</div>
         <div class="cell col-count" data-sort="monoCount">Mono Count</div>
         <div class="cell col-count" data-sort="xrefCount">Xref Count</div>
+        <div class="cell col-count" data-sort="thisCount">This Count</div>
         <div class="cell col-type" data-sort="type">Type</div>
         <div class="cell col-tag" data-sort="tags">Tag</div>
       </div>    
@@ -966,7 +973,11 @@ function setupTable(){
   document.getElementById("showCompilerGenerated").addEventListener("change", renderVirtualTable);
   document.getElementById("generic").addEventListener("change", renderVirtualTable);
   document.getElementById("minMonoCount").addEventListener("input", renderVirtualTable);
+  document.getElementById("maxMonoCount").addEventListener("input", renderVirtualTable);
   document.getElementById("minXrefCount").addEventListener("input", renderVirtualTable);
+  document.getElementById("maxXrefCount").addEventListener("input", renderVirtualTable);
+  document.getElementById("minThisCount").addEventListener("input", renderVirtualTable);
+  document.getElementById("maxThisCount").addEventListener("input", renderVirtualTable);
 
   // toggle buttons
   document.querySelectorAll(".toggle-button").forEach(btn => {
@@ -1084,6 +1095,7 @@ function updateDatasetFromJson() {
       returnType: data.ReturnType,
       monoCount: data.MonoCount,
       xrefCount: data.XrefCount,
+      thisCount: data.ThisCount || 0,
       type: data.Type || "Method",
       tags: data.Tags || []
     };
@@ -1104,7 +1116,13 @@ function renderVirtualTable() {
   const generic = document.getElementById("generic").classList.contains("toggled");
 
   const minMono = parseInt(document.getElementById("minMonoCount").value, 10) || 0;
+  const maxMono = parseInt(document.getElementById("maxMonoCount").value, 10) || Infinity;
+
   const minXref = parseInt(document.getElementById("minXrefCount").value, 10) || 0;
+  const maxXref = parseInt(document.getElementById("maxXrefCount").value, 10) || Infinity;
+
+  const minThis = parseInt(document.getElementById("minThisCount").value, 10) || 0;
+  const maxThis = parseInt(document.getElementById("maxThisCount").value, 10) || Infinity;
 
   visibleEntries = allEntries.filter(entry => {
 
@@ -1118,13 +1136,14 @@ function renderVirtualTable() {
     const matchesType = typeFilter.length === 0 || typeFilter.includes(entry.type);
     const matchesCompilerGenerated = showCompilerGenerated || !entry.tags.includes("compiler-generated");
     const matchesGeneric = generic || !entry.tags.includes("generic");
-    const matchesMonoCount = entry.monoCount >= minMono;
-    const matchesXrefCount = entry.xrefCount >= minXref;
+    const matchesMonoCount = entry.monoCount >= minMono && entry.monoCount <= maxMono;
+    const matchesXrefCount = entry.xrefCount >= minXref && entry.xrefCount <= maxXref;
+    const matchesThisCount = (entry.thisCount || 0) >= minThis && (entry.thisCount || 0) <= maxThis;
     const matchesMultiMethod = advancedMethodLines.length === 0 || advancedMethodLines.some(startsWith);
 
     return matchesMethod && matchesReturn && matchesTag && matchesType && 
     matchesCompilerGenerated && matchesGeneric && matchesMonoCount && matchesXrefCount
-    && matchesMultiMethod;
+    && matchesThisCount && matchesMultiMethod;
   });
 
   if (sortField) {
@@ -1200,6 +1219,7 @@ function renderVisibleRows() {
       </div>
       <div class="cell col-count">${entry.monoCount}</div>
       <div class="cell col-count">${entry.xrefCount}</div>
+      <div class="cell col-count">${entry.thisCount || 0}</div>
       <div class="cell col-type">${entry.type}</div>
       <div class="cell col-tag"></div>
     `;
