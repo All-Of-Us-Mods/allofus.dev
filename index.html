@@ -1,45 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Of Us Mods</title>
     <link rel="shortcut icon" type="image/x-icon" href="favicon.png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap');
+
         body {
-            background-color: #14141C;
-            color: #ffffff;
+            background-color: #12121C;
+            color: #E0E0E0;
             font-family: 'Lexend', Arial, sans-serif;
             margin: 0;
             padding: 0;
             text-align: center;
         }
+
         .container {
-            max-width: 800px;
+            max-width: 960px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
+            z-index: 1;
         }
         
         h1 {
-            font-size: 32px;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #FFFFFF;
         }
-        
+
         h2 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            margin-top: 0px;
+            font-size: 1.75rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #D3B65E;
         }
         
         p {
-            margin-bottom: 10px;
-        }
-        
-        ul {
-            margin-bottom: 20px;
-        }
-        
-        li {
-            margin-bottom: 5px;
+            margin-bottom: 1rem;
+            line-height: 1.6;
         }
 
         a {
@@ -48,42 +49,58 @@
         }
 
         .card-link {
-            color: #D3B65E;
+            color: #FFC107;
             text-decoration: none;
             transition: color 0.3s ease;
         }
 
         .card-link:hover {
-            color: #FFC107;
+            color: #E0E0E0;
         }
         
         .card {
-            display: inline-block;
-            background-color: #23232D;
-            color: #ffffff;
-            padding: 10px;
-            border-radius: 10px;
-            max-width: 300px;
-            transition: background-color 0.3s ease;
-            opacity: 0.9;
+            background-color: #1C1C28;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            text-align: left;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            max-width: 400px;
         }
 
         .card:hover {
-            background-color: #2A2A36;
-            cursor: pointer;
+            background-color: #262638;
+            transform: translateY(-5px);
         }
         
         .card h3 {
-            font-size: 18px;
-            margin-bottom: 5px;
+            font-size: 1.25rem;
             margin-top: 0;
+            margin-bottom: 0.5rem;
+            color: #D3B65E;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        .card .card-link {
+            font-weight: bold;
         }
 
         .row {
             display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 20px;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+            margin-bottom: 30px;
         }
 
         .col {
@@ -94,13 +111,15 @@
             align-items: center;
         }
 
-        iframe, .card {
-            transition: transform 0.3s;
-            opacity: 0.9;
+        iframe {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
         }
 
-        iframe:hover, .card:hover {
-            transform: scale(1.05);
+        iframe:hover {
+            transform: translateY(-5px);
         }
 
         .bg-img {
@@ -111,47 +130,73 @@
             height: 100%;
             object-fit: cover;
             z-index: -1;
-            filter: blur(12px);
-            -webkit-filter: blur(12px);
-            opacity: 0.5;
+            filter: blur(10px) brightness(60%);
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .row {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .col {
+                width: 100%;
+            }
+
+            .card {
+                max-width: none;
+            }
+
+            iframe {
+                width: 100% !important;
+                height: 350px !important;
+            }
         }
     </style>
 </head>
 <body>
-    <img class="bg-img" src="static/images/background.webp">
+    <img class="bg-img" src="static/images/background.webp" alt="Among Us themed background">
     <div class="container">
         <h1>All Of Us Mods</h1>
+        <p>Welcome to the official website of All Of Us Mods. We create innovative and high-quality mods for the game Among Us.</p>
 
         <div class="row">
             <div class="col">
                 <h2>Our Products</h2>
-                <a href="https://github.com/All-Of-Us-Mods/MiraAPI" target="_blank">
-                    <div class="card">
-                        <h3>Mira API</h3>
-                        <p>A comprehensive yet easy to use Among Us Modding API.</p>
-                        <a class="card-link">Learn More</a>
-                    </div>
-                </a>
-                <a href="https://github.com/All-Of-Us-Mods/LaunchpadReloaded" target="_blank">
-                    <div class="card">
-                        <h3>Launchpad Reloaded</h3>
-                        <p>A vanilla-oriented Among Us mod with unique features.</p>
-                        <a class="card-link">Learn More</a>
-                    </div>
-                </a>
-                <a href="https://discord.gg/FYYqJU2bvp" target="_blank">
-                    <div class="card">
-                        <h3>Starlight</h3>
-                        <p>An innovative Among Us mod launcher for Android.</p>
-                        <a class="card-link">Learn More in our Discord</a>
-                    </div>
-                </a>
+                <div class="card">
+                    <h3>Mira API</h3>
+                    <p>A comprehensive yet easy-to-use Among Us Modding API. Provides a robust framework for developers to create new content.</p>
+                    <a href="https://github.com/All-Of-Us-Mods/MiraAPI" target="_blank" class="card-link">Learn More</a>
+                </div>
+
+                <div class="card">
+                    <h3>Launchpad Reloaded</h3>
+                    <p>A vanilla-oriented Among Us mod with unique features, enhancing the gameplay experience without overcomplicating it.</p>
+                    <a href="https://github.com/All-Of-Us-Mods/LaunchpadReloaded" target="_blank" class="card-link">Learn More</a>
+                </div>
+                <div class="card">
+                    <h3>Starlight</h3>
+                    <p>An innovative Among Us mod launcher for Android, making it easier for mobile users to access and play with mods.</p>
+                    <a href="https://discord.gg/FYYqJU2bvp" target="_blank" class="card-link">
+                        Learn More in our Discord
+                    </a>
+                </div>
             </div>
             <div class="col">
                 <h2>Our Community</h2>
-                <iframe src="https://discord.com/widget?id=1333104345906020402&theme=dark" width="350" style="flex-grow:1;" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>    
+                <iframe src="https://discord.com/widget?id=1333104345906020402&theme=dark" width="100%" height="450px" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
             </div>
         </div>
+
         <p>Thank you for visiting All Of Us Mods. Stay tuned for more exciting updates!</p>
         <a href="privacy-policy.html" class="card-link">Privacy Policy</a>
     </div>
