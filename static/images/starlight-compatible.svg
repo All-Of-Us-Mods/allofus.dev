@@ -1,0 +1,17 @@
+<svg aria-label="This mod is compatible with Starlight" role="img" viewBox="0 0 250 60" height="60" width="250" xmlns="http://www.w3.org/2000/svg">
+  
+  <rect fill="#1a1a21" ry="10" rx="10" height="60" width="250"></rect>
+  
+  
+  <image height="40" width="40" y="10" x="10" href="https://allofus.dev/static/images/starlight.png"></image>
+
+  
+  <text font-size="12" font-family="Roboto, sans-serif" fill="#ffffff" y="24" x="60">
+    This mod is compatible with
+  </text>
+
+  
+  <text font-weight="bold" font-size="20" font-family="Roboto, sans-serif" fill="#ffffff" y="46" x="60">
+    Starlight
+  </text>
+</svg>
