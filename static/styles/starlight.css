@@ -1,0 +1,121 @@
+@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap");
+
+:root {
+  --primary: #d3b65e;
+  --onPrimary: #3c2f00;
+  --primaryContainer: #574500;
+  --onPrimaryContainer: #ffe086;
+  --secondary: #e9c16c;
+  --onSecondary: #3f2e00;
+  --background: #131318;
+  --onBackground: #e4e1e9;
+  --surface: #131318;
+  --onSurface: #e4e1e9;
+  --surfaceContainer: #1f1f25;
+  --surfaceContainerHigh: #2a292f;
+  --outline: #979080;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--onBackground);
+  font-family: "Lexend", sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.header {
+  text-align: center;
+  padding: 2rem 1rem;
+  background-color: var(--surfaceContainerHigh);
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  color: var(--primary);
+  margin: 0;
+}
+
+.tagline {
+  margin-top: 0.5rem;
+  color: var(--onSurface);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+h2 {
+  color: var(--secondary);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.feature-card {
+  background-color: var(--surfaceContainer);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.feature-card h3 {
+  color: var(--primary);
+  margin-top: 0;
+}
+
+.download {
+  text-align: center;
+  margin: 3rem 0;
+}
+
+.download-btn {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background-color: var(--primary);
+  color: var(--onPrimary);
+  font-weight: bold;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.download-btn:hover {
+  background-color: var(--secondary);
+  transform: scale(1.05);
+}
+
+.community {
+  margin: 3rem 0;
+  text-align: center;
+}
+
+.footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: var(--surfaceContainerHigh);
+  color: var(--onSurface);
+}
+
+.footer a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}

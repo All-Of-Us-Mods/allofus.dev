@@ -1,0 +1,26 @@
+{
+  "2025.10.14": {
+    "game_version": "17.0.1",
+    "release_date": "2025-10-14",
+    "analyses": {
+      "win-x86": "il2cpp/2025.10.14/method_analysis_results_win_x86.json",
+      "android-arm64": "il2cpp/2025.10.14/method_analysis_results_android_arm64.json"
+    }
+  },
+  "2025.9.9": {
+    "game_version": "17.0.0",
+    "release_date": "2025-09-09",
+    "analyses": {
+      "win-x86": "il2cpp/2025.9.9/method_analysis_results_win_x86.json",
+      "android-arm64": "il2cpp/2025.9.9/method_analysis_results_android_arm64.json"
+    }
+  },
+  "2025.6.10": {
+    "game_version": "16.1.0",
+    "release_date": "2025-06-10",
+    "analyses": {
+      "win-x86": "il2cpp/2025.6.10/method_analysis_results_win_x86.json",
+      "android-arm64": "il2cpp/2025.6.10/method_analysis_results_android_arm64.json"
+    }
+  }
+}
