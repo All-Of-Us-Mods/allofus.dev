@@ -15,7 +15,45 @@
 </head>
 
 <body>
-  <h1>IL2CPP Mono Methods Analyzer</h1>
+  <div class="header">
+    <h1>
+      IL2CPP Mono Methods Analyzer
+    </h1>
+    <button type="button" id="helpBtn" class="button-base help-button">❔</button>
+    <div class="base-window hidden" id="help-window">
+      <div class="window-header no-move">
+        <span class="window-title">Help</span>
+        <span class="window-close">×</span>
+      </div>
+      <div class="help-window-body window-body">
+        <h2>How to Use</h2>
+        <ol>
+          <li>Click "Select Version" to choose an existing game version or "Choose JSON File" to upload your own
+            IL2CPP JSON file.</li>
+          <li>Use the search boxes and filters to narrow down the list of methods based on your criteria.</li>
+          <li>Click on column headers to sort the methods by that column.</li>
+          <li>The count display shows the number of methods currently visible out of the total loaded.</li>
+        </ol>
+        <h2>Filters Explained</h2>
+        <ul>
+          <li><strong>Search Methods:</strong> Filter methods by name.</li>
+          <li><strong>Search Return Types:</strong> Filter methods by their return type.</li>
+          <li><strong>Method Filter:</strong> Open advanced filtering options for method names.</li>
+          <li><strong>Toggle Buttons:</strong> Enable or disable filters for compiler-generated and generic methods.</li>
+          <li><strong>Min/Max Counts:</strong> Set minimum and maximum thresholds for Mono, Xref, and This counts.</li>
+          <li><strong>Tag and Type Filters:</strong> Select specific tags and types to filter methods accordingly.</li>
+        </ul>
+        <h2>Tags Explained</h2>
+        <ul>
+          <li><strong>Inlined:</strong> Methods that have been inlined by the compiler. These are usually not safe to patch, but are okay to call.</li>
+          <li><strong>Used by Inlined:</strong> Methods that are used by inlined methods. Helpful to identify possibly inlined methods. These methods are typically safe to patch and call.</li>
+          <li><strong>Stripped:</strong> Methods that have been stripped from the build. These methods are not safe to patch or call. The code no longer exists in the game.</li>
+          <li><strong>Matched:</strong> Methods that have been matched to their IL2CPP counterparts. These methods are typically safe to patch and call.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
   <div class="upload-inputs">
     <button type="button" class="button-base blue-btn" id="browseVersions">🔍 Select Version</button>
     <label for="fileInput" class="button-base">📁 Choose JSON File<input type="file" id="fileInput"
@@ -104,7 +142,7 @@
       </div>
     </div>
   </div>
-  <div id="advWindow" class="usage-window hidden">
+  <div id="advWindow" class="base-window hidden">
     <div class="window-header">
       <span class="window-title">Advanced Method Filter</span>
       <span class="window-close">×</span>
@@ -117,7 +155,7 @@
     </div>
     <div class="resize-handle"></div>
   </div>
-  <div id="versionsWindow" class="usage-window no-resize version-window">
+  <div id="versionsWindow" class="base-window no-resize version-window">
     <div class="window-header no-move">
       <span class="window-title">Select Game Version</span>
       <span class="window-close">×</span>

@@ -175,8 +175,19 @@ body {
 }
 
 h1 {
-  margin-top: 0;
-  margin-bottom: 0.625rem;
+  margin: 0;
+  vertical-align: middle;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .spacer {
@@ -349,9 +360,9 @@ h1 {
   height: 0;
 }
 
-.usage-window {
+.base-window {
   position: fixed;
-  width: 600px;
+  max-width: 60vh;
   max-height: 80vh;
   background-color: var(--background-light);
   border: var(--border-width) solid var(--border-color);
@@ -360,7 +371,14 @@ h1 {
   display: flex;
   flex-direction: column;
   z-index: 100;
-  right: 1.25rem;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  overflow: scroll;
+}
+
+.usage-window {
+  width: 600px;
   top: 1.25rem;
   resize: both;
   overflow: hidden;
@@ -428,7 +446,7 @@ h1 {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2000;
-  height: 80vh;
+  max-height: 80vh;
   overflow: auto;
   margin: 0 !important;
 }
@@ -525,34 +543,6 @@ h1 {
   padding-bottom: 0.25rem;
   border-bottom: var(--border-width) solid var(--border-color-light);
   color: #555;
-}
-
-/* at widths ≤ 768px, usage windows expand to cover the whole screen */
-@media (max-width: 768px) {
-  .usage-window {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    max-height: 100% !important;
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    resize: none !important;
-    margin: 0 !important;
-    background-color: var(--background-light) !important;
-    z-index: 1000; /* above everything */
-  }
-  /* hide the resize handle on mobile */
-  .usage-window .resize-handle {
-    display: none !important;
-  }
-  /* optional: make header non-draggable */
-  .usage-window .window-header {
-    cursor: default !important;
-  }
 }
 
 .mono-only {
@@ -912,19 +902,33 @@ h1 {
   display: block;
 }
 
+
+/* at widths ≤ 768px, usage windows expand to cover the whole screen */
 @media (max-width: 768px) {
-  .version-window {
-    border: 0 !important;
-    position: fixed;
-    top: 0% !important;
-    left: 0% !important;
-    right: 0% !important;
-    bottom: 0% !important;
-    transform: none !important;
+  .base-window {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    max-height: 100% !important;
     width: 100% !important;
     height: 100% !important;
-    max-height: 100vh !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    resize: none !important;
     margin: 0 !important;
+    background-color: var(--background-light) !important;
+    z-index: 1000; /* above everything */
+    transform: none !important;
+  }
+  /* hide the resize handle on mobile */
+  .usage-window .resize-handle {
+    display: none !important;
+  }
+  /* optional: make header non-draggable */
+  .usage-window .window-header {
+    cursor: default !important;
   }
 
   .version-item {

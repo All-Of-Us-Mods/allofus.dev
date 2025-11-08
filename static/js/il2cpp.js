@@ -27,6 +27,13 @@ const visibleTags = {
     "matched": "Matched",
 }
 
+const tagTips = {
+    "inlined": "Might be inlined by the game. Check usages for more info. (patching unsafe).",
+    "used-by-inline": "Might be used by an Inlined method. Can be useful to find inlined methods. (patching likely safe).",
+    "stripped": "Was not found in IDA dump. Likely removed from game binary completely (cant patch or call it)",
+    "matched": "Mono usage and IDA dump usage (xrefs) match. (safe to patch and call)",
+}
+
 // platform nice names
 const platformNames = {
     "win-x86": "Windows x86 (32-bit)",
@@ -55,6 +62,17 @@ if (!savedTheme) {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     html.setAttribute("data-theme", prefersDark ? "dark" : "light");
 }
+
+const helpWindow = document.getElementById("help-window");
+helpWindow.querySelector('.window-close').addEventListener('click', () => {
+    helpWindow.classList.add("hidden");
+});
+
+document.getElementById("helpBtn").addEventListener("click", () => {
+    helpWindow.classList.toggle("hidden");
+});
+
+
 
 document.getElementById("toggleThemeBtn").addEventListener("click", () => {
     const current = html.getAttribute("data-theme");
@@ -467,7 +485,7 @@ function createUsageWindow(methodName) {
     const windowEl = document.createElement('div');
     const windowId = 'window-' + Date.now();
 
-    windowEl.className = 'usage-window';
+    windowEl.classList.add('base-window', 'usage-window');
     windowEl.id = windowId;
     windowEl.setAttribute("data-method", methodName);
     windowEl.style.zIndex = getNextZIndex();
