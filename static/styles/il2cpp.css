@@ -942,11 +942,6 @@ h1 {
     border: 0;
   }
 
-  .version-info {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-
   .version-number,
   .game-version,
   .release-date {
