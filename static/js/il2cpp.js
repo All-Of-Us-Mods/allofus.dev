@@ -27,6 +27,14 @@ const visibleTags = {
     "matched": "Matched",
 }
 
+// platform nice names
+const platformNames = {
+    "win-x86": "Windows x86 (32-bit)",
+    "win-x86_64": "Windows x86_64 (64-bit)",
+    "android-arm64": "Android ARM64 (64-bit)",
+    "android-arm": "Android ARMv7 (32-bit)",
+}
+
 // Z indexing
 let currentZ = 500
 
@@ -96,9 +104,10 @@ function setupVersionSelector() {
 
                 const dropdownContent = tempDiv.querySelector('.dropdown-content');
                 Object.entries(versionData.analyses).forEach(([analysis, analysisData]) => {
+                    const niceName = platformNames[analysis] || analysis;
                     const analysisOption = `
-            <div class="analysis-option" data-platform="${analysis}">
-                <span class="platform-name">${analysis}</span>
+            <div class="analysis-option" data-platform="${niceName}">
+                <span class="platform-name">${niceName}</span>
             </div>`;
                     const analysisTempDiv = document.createElement('div');
                     analysisTempDiv.innerHTML = analysisOption.trim();
