@@ -13,6 +13,11 @@
     <p class="tagline">The first Android mod launcher for <em>Among Us</em></p>
   </header>
 
+  <!-- Release Countdown Banner -->
+  <section class="release-banner" role="status" aria-live="polite">
+    <p><strong>New release in:</strong> <span id="release-countdown">Calculating…</span></p>
+  </section>
+
   <main class="container">
     <section class="intro">
       <p>
@@ -42,7 +47,11 @@
     <section class="download">
       <h2>Download Starlight</h2>
       <p>Get the latest version now:</p>
-      <a href="https://play.google.com/store/apps/details?id=dev.allofus.starlight" target="_blank" class="download-btn">Download from Google Play</a>
+      <div class="download-actions">
+        <a href="https://play.google.com/store/apps/details?id=dev.allofus.starlight" target="_blank" rel="noopener" class="download-btn">Register on Google Play</a>
+        <a id="apk-download" class="download-btn disabled" aria-disabled="true" title="Release isn't here yet. APK unlocks when countdown ends."
+           data-href="https://github.com/All-Of-Us-Mods/starlight-releases/releases/download/1203/starlight-1203.apk">Download APK Directly</a>
+      </div>
     </section>
 
     <section class="community">
@@ -56,5 +65,50 @@
   <footer class="footer">
     <p>© 2025 Starlight • <a href="index.html">Back to All Of Us Mods</a></p>
   </footer>
+
+  <script>
+    (function() {
+      const targetMs = 1766876400 * 1000; // UTC timestamp in milliseconds
+      const countdownEl = document.getElementById('release-countdown');
+      const bannerEl = document.querySelector('.release-banner');
+      const apkEl = document.getElementById('apk-download');
+
+      function pad(n) { return n.toString().padStart(2, '0'); }
+
+      function updateCountdown() {
+        const now = Date.now();
+        const diff = targetMs - now;
+
+        if (diff <= 0) {
+          countdownEl.textContent = 'Released!';
+          bannerEl && bannerEl.classList.add('released');
+
+          // Unlock APK download
+          if (apkEl) {
+            const href = apkEl.getAttribute('data-href');
+            if (href) {
+              apkEl.setAttribute('href', href);
+            }
+            apkEl.removeAttribute('aria-disabled');
+            apkEl.classList.remove('disabled');
+            apkEl.removeAttribute('title');
+          }
+
+          clearInterval(timer);
+          return;
+        }
+
+        const totalSeconds = Math.floor(diff / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        countdownEl.textContent = `${days}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+      }
+
+      updateCountdown();
+      const timer = setInterval(updateCountdown, 1000);
+    })();
+  </script>
 </body>
 </html>

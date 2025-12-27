@@ -83,6 +83,14 @@ h2 {
   margin: 3rem 0;
 }
 
+.download-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 .download-btn {
   display: inline-block;
   padding: 1rem 2rem;
@@ -97,6 +105,13 @@ h2 {
 .download-btn:hover {
   background-color: var(--secondary);
   transform: scale(1.05);
+}
+
+.download-btn.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .community {
@@ -118,4 +133,70 @@ h2 {
 
 .footer a:hover {
   text-decoration: underline;
+}
+
+/* Release Countdown Banner */
+.release-banner {
+  width: 100%;
+  margin: 0;
+  padding: 24px 32px;
+  background: linear-gradient(90deg, #7c3aed, #d946ef, #06b6d4, #22c55e);
+  color: #ffffff;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+}
+
+.release-banner p {
+  margin: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.release-banner strong {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
+}
+
+#release-countdown {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+}
+
+.release-banner.released {
+  background: linear-gradient(90deg, #10b981, #22c55e, #34d399);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 640px) {
+  .release-banner {
+    padding: 16px 20px;
+    font-size: 1.25rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  }
+}
+
+@media (max-width: 420px) {
+  .release-banner {
+    padding: 12px 16px;
+    font-size: 1.1rem;
+  }
+  .release-banner p {
+    display: block;
+  }
+  #release-countdown {
+    display: block;
+    margin-top: 4px;
+  }
 }
