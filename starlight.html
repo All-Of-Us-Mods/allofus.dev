@@ -48,7 +48,7 @@
       <h2>Download Starlight</h2>
       <p>Get the latest version now:</p>
       <div class="download-actions">
-        <a href="https://play.google.com/store/apps/details?id=dev.allofus.starlight" target="_blank" rel="noopener" class="download-btn">Register on Google Play</a>
+        <a id="gplay-download" href="https://play.google.com/store/apps/details?id=dev.allofus.starlight" target="_blank" rel="noopener" class="download-btn">Register on Google Play</a>
         <a id="apk-download" class="download-btn disabled" aria-disabled="true" title="Release isn't here yet. APK unlocks when countdown ends."
            data-href="https://github.com/All-Of-Us-Mods/starlight-releases/releases/download/1203/starlight-1203.apk">Download APK Directly</a>
       </div>
@@ -72,6 +72,7 @@
       const countdownEl = document.getElementById('release-countdown');
       const bannerEl = document.querySelector('.release-banner');
       const apkEl = document.getElementById('apk-download');
+      const gplayEl = document.getElementById('gplay-download');
 
       function pad(n) { return n.toString().padStart(2, '0'); }
 
@@ -92,6 +93,10 @@
             apkEl.removeAttribute('aria-disabled');
             apkEl.classList.remove('disabled');
             apkEl.removeAttribute('title');
+          }
+
+          if (gplayEl) {
+            gplayEl.textContent = 'Download on Google Play';
           }
 
           clearInterval(timer);
