@@ -21,6 +21,7 @@
   --color-copy-btn-copied: #28a745;
   --color-backtotop-bg: #007bff;
   --color-backtotop-text: #fff;
+  --color-backtotop-hover-bg: #0056b3;
 }
 
 body.dark-mode {
@@ -44,7 +45,7 @@ body.dark-mode {
   --color-copy-btn: #4a90e2;
   --color-copy-btn-success: #28a745;
   --color-copy-btn-copied: #28a745;
-  --color-backtotop-bg: #4a90e2;
+  --color-backtotop-bg: #007bff;
   --color-backtotop-text: #fff;
 }
 
@@ -57,8 +58,8 @@ body.dark-mode {
   z-index: 1000;
   border: none;
   border-radius: 6px;
-  background: var(--color-link);
-  color: #fff;
+  background: var(--color-backtotop-bg);
+  color: var(--color-backtotop-text);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   opacity: 0;
@@ -72,6 +73,10 @@ body.dark-mode {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+}
+
+#back-to-top:hover {
+  background: var(--color-backtotop-hover-bg);
 }
 
 .copy-button {
@@ -275,8 +280,8 @@ footer p {
   position: fixed;
   bottom: 20px;
   left: 20px;
-  background: #007bff;
-  color: white;
+  background: var(--color-backtotop-bg);
+  color: var(--color-backtotop-text);
   border: none;
   padding: 8px 12px;
   border-radius: 4px;
@@ -286,7 +291,7 @@ footer p {
 }
 
 #dark-mode-toggle:hover {
-  background: #0056b3
+  background: var(--color-backtotop-hover-bg);
 }
 
 .guide-card {
