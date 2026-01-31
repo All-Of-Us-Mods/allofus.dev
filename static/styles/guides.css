@@ -10,6 +10,7 @@
   --color-link: #007bff;
   --color-link-hover: #0056b3;
   --color-link-bg-hover: #e6f0ff;
+  --color-link-visited: #6c5ce7;
   --color-footer-bg: #f4f4f4;
   --color-footer: #f4f4f4;
   --color-code-bg: #23272e;
@@ -34,6 +35,7 @@ body.dark-mode {
   --color-link: #7abaff;
   --color-link-hover: #4a90e2;
   --color-link-bg-hover: #263445;
+  --color-link-visited: #9b87f5;
   --color-footer-bg: #23272e;
   --color-footer: #23272e;
   --color-code-bg: #2a2d32;
@@ -167,6 +169,10 @@ header nav ul li a:hover,
 header nav ul li a:focus {
   background: var(--color-link-bg-hover);
   color: var(--color-link-hover);
+}
+
+a:visited {
+  color: var(--color-link-visited);
 }
 
 footer {
