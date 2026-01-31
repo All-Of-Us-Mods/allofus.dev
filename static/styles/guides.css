@@ -74,12 +74,6 @@ body.dark-mode {
   pointer-events: auto;
 }
 
-#back-to-top.visible {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
 .copy-button {
   transition:
     background 0.2s,
@@ -281,7 +275,7 @@ footer p {
   position: fixed;
   bottom: 20px;
   left: 20px;
-  background: var(--color-link);
+  background: #007bff;
   color: white;
   border: none;
   padding: 8px 12px;
@@ -292,7 +286,34 @@ footer p {
 }
 
 #dark-mode-toggle:hover {
-  background: var(--color-link-hover);
+  background: #0056b3
+}
+
+.guide-card {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.guide-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-link);
+}
+
+.guide-card h2 {
+  color: var(--color-link);
+  margin-top: 0;
+  font-size: 1.5rem;
+}
+
+.guide-card p {
+  margin-bottom: 0;
 }
 
 @media (max-width: 600px) {

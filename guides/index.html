@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Development Guides - All Of Us Mods</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png">
+    <link type="text/css" rel="stylesheet" href="/static/styles/guides.css?v=1">
+</head>
+
+<body>
+    <header>
+        <h1>Development Guides</h1>
+        <button id="dark-mode-toggle">🌙 Dark</button>
+    </header>
+    <main>
+        <article>
+            <a class="guide-card" href="/guides/custom-libunity/">
+                <h2>Building a Custom libunity.so</h2>
+                <p>Learn how to create a custom libunity.so file for Lemonloader/BepInEx on Android to fix engine stripping errors.</p>
+            </a>
+
+            <a class="guide-card" href="/guides/starlight-dev-guide/">
+                <h2>Starlight Development Guide</h2>
+                <p>Complete guide for developing mods using the Starlight mod loader for Among Us on Android.</p>
+            </a>
+        </article>
+    </main>
+<script>
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const body = document.body;
+
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'true') {
+        body.classList.add('dark-mode');
+        darkModeToggle.textContent = '☀️ Light';
+    } else {
+        darkModeToggle.textContent = '🌙 Dark';
+    }
+    
+    darkModeToggle.addEventListener('click', function () {
+        body.classList.toggle('dark-mode');
+        const isDark = body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        darkModeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+    });
+</script>
+</body>
+
+</html>
