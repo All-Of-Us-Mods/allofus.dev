@@ -111,7 +111,10 @@ string dataPath = Path.Combine(Application.persistentDataPath, "MyModData");</co
                 you will need to find an alternative approach. To test compile-time differences, you can temporarily
                 switch your project to reference the AmongUs.GameLibs.Android NuGet package from BepInEx. This
                 package contains the Android version of the Among Us assemblies, allowing you to catch any
-                compilation errors before deploying to an Android device. There is a known issue with the
+                compilation errors before deploying to an Android device.
+            </p>
+            <p>
+                There is a known issue with the
                 Android assemblies where compiler-generated MoveNext methods are missing, but they do exist
                 in the actual game. You can ignore these specific errors. If you are referencing a MoveNext
                 using the nameof operator, you can replace it with the string "MoveNext" to avoid the error.
@@ -123,19 +126,15 @@ string dataPath = Path.Combine(Application.persistentDataPath, "MyModData");</co
                 allowing your mod to adapt its behavior at runtime. For example, Mira API's IntroCutscene.OnDestroy
                 patch checks for the existence of the OnDestroy method and uses a fallback if it is not found.
                 You can view this implementation
-                <a
-                    href="https://github.com/All-Of-Us-Mods/MiraAPI/blob/50030c113bf54cf050cccdd88c407572e047b6ac/MiraAPI/Patches/IntroCutscenePatches.cs#L89" target="_blank">
-                    here.
-                </a>
+                <a href="https://github.com/All-Of-Us-Mods/MiraAPI/blob/50030c113bf54cf050cccdd88c407572e047b6ac/MiraAPI/Patches/IntroCutscenePatches.cs#L89"
+                    target="_blank">here.</a>
             </p>
             <p>
                 Many compiler-generated classes, such as those related to coroutines, are different
                 between PC and Android. If your mod interacts with these classes, you may need to
                 adjust your code accordingly. You can use reflection to dynamically resolve and
                 interact with these classes at runtime.
-                <a href="https://github.com/NuclearPowered/Reactor/pull/98" target="_blank">
-                    This Reactor PR
-                </a>
+                <a href="https://github.com/NuclearPowered/Reactor/pull/98" target="_blank">This Reactor PR</a>
                 demonstrates how to dynamically resolve compiler-generated coroutine classes for compatibility across
                 platforms.
             </p>
@@ -155,8 +154,8 @@ else
 }</code></pre>
             <p>
                 Reactor uses this approach to load platform-specific asset bundles, as shown
-                <a
-                    href="https://github.com/NuclearPowered/Reactor/blob/master/Reactor/Utilities/AssetBundleManager.cs#L46" target="_blank">
+                <a href="https://github.com/NuclearPowered/Reactor/blob/master/Reactor/Utilities/AssetBundleManager.cs#L46"
+                    target="_blank">
                     here.
                 </a>
             </p>
@@ -184,7 +183,7 @@ else
                 Most of the platform differences are abstracted away by Starlight, BepInEx, and .NET.
                 However, there are still some things to be aware of. PC Among Us is typically resilient
                 to bad programming from mod developers, so memory corruption bugs may go unnoticed.
-                However, on Android, these bugs can lead to crashes or unexpected behavior. You should 
+                However, on Android, these bugs can lead to crashes or unexpected behavior. You should
                 be careful with any IL2CPP interop code, as it is more likely to cause issues on Android.
                 Additionally, patching certain methods causes crashes and instability.
                 Some methods can be manually stabilized by Starlight, but we don't know which
@@ -209,8 +208,8 @@ else
                 replicate the functionality of keyboard and mouse inputs. For example, MoveMod has
                 platform-specific input handling to support both PC and Android controls.
                 You can view the implementation
-                <a
-                    href="https://github.com/OvernightAU/MoveMod/blob/9b4e2c8ce1418d497433f49eff5a1a2e148bb252/MoveModPublic/Modules/MoveWithMouse.cs#L23" target="_blank">
+                <a href="https://github.com/OvernightAU/MoveMod/blob/9b4e2c8ce1418d497433f49eff5a1a2e148bb252/MoveModPublic/Modules/MoveWithMouse.cs#L23"
+                    target="_blank">
                     here.
                 </a>
             </p>
@@ -265,8 +264,8 @@ else
                 to manage platform-specific code. For example, you can define a symbol "ANDROID"
                 for Android builds and use #if ANDROID directives in your code to include or exclude
                 platform-specific code. For an example, see older versions of
-                <a
-                    href="https://github.com/All-Of-Us-Mods/LaunchpadReloaded/blob/2dc98892063e706d87641e176e74ffd2e2073059/LaunchpadReloaded/LaunchpadReloaded.csproj" target="_blank">
+                <a href="https://github.com/All-Of-Us-Mods/LaunchpadReloaded/blob/2dc98892063e706d87641e176e74ffd2e2073059/LaunchpadReloaded/LaunchpadReloaded.csproj"
+                    target="_blank">
                     LaunchpadReloaded.
                 </a>
             </p>
@@ -347,12 +346,12 @@ else
         const darkModeToggle = document.getElementById('dark-mode-toggle');
         const body = document.body;
         const isDarkMode = localStorage.getItem('darkMode') === 'true';
-        
+
         if (isDarkMode) {
             body.classList.add('dark-mode');
             darkModeToggle.textContent = '☀️ Light';
         }
-        
+
         darkModeToggle.addEventListener('click', function () {
             body.classList.toggle('dark-mode');
             const isDark = body.classList.contains('dark-mode');
