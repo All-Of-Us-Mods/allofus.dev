@@ -113,7 +113,8 @@ string dataPath = Path.Combine(Application.persistentDataPath, "MyModData");</co
                 package contains the Android version of the Among Us assemblies, allowing you to catch any
                 compilation errors before deploying to an Android device. There is a known issue with the
                 Android assemblies where compiler-generated MoveNext methods are missing, but they do exist
-                in the actual game. You can ignore these specific errors.
+                in the actual game. You can ignore these specific errors. If you are referencing a MoveNext
+                using the nameof operator, you can replace it with the string "MoveNext" to avoid the error.
             </p>
             <p>
                 Releasing two separate builds of your mod, one for PC and one for Android, can be tedious.
