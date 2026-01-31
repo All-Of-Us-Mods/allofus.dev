@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building a Custom libunity.so</title>
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.png">
+    <link type="text/css" rel="stylesheet" href="/static/styles/guides.css">
+</head>
+
+<body>
+    <header>
+        <h1>Building a Custom libunity.so</h1>
+        <nav>
+            <ul>
+                <li><a href="#step-1">Install Unity Editor</a></li>
+                <li><a href="#step-2">Create a Unity Project</a></li>
+                <li><a href="#step-3">Build Custom libunity.so</a></li>
+                <li><a href="#step-4">Test Custom libunity.so</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article>
+            <h1>Creating a custom libunity.so for Lemonloader/BepInEx on Android</h1>
+            <p>When using Lemonloader or similar projects to mod an IL2CPP Unity game on Android, you may come across
+                the following error:</p>
+            <img src="/static/images/libunity/errors.webp" alt="Error message">
+            <p>This error can happen when using an unstripped libunity.so file with a game that has engine stripping
+                enabled.
+                To fix it, we can create a custom libunity.so file that strips out the erroring modules.
+            </p>
+            <p>
+                <strong>Note:</strong> This guide assumes you have a PC capable of running the Unity editor
+                and a basic understanding of installing and using Unity.
+            </p>
+
+            <section id="step-1">
+                <h2>Step 1: Install Unity Editor</h2>
+                <p>First, you must install <a href="https://unity.com/unity-hub">Unity Hub</a>.
+                    Unity Hub allows you to manage multiple Unity installs, but more importantly, to install the Android
+                    build tools necessary for this guide.
+                </p>
+                <p>
+                    After downloading Unity Hub, you need to install the version of Unity that matches the game you are
+                    modding.
+                </p>
+                <img src="/static/images/libunity/unity-hub.webp" alt="Unity Hub">
+                <p>
+                    If that version of Unity is not available in Unity Hub, you can download it from the <a
+                        href="https://unity.com/releases/editor/archive">Unity Editor Archive</a>.
+                    However, when downloading from the Archive, you need to press the "Install" button in the "Hub
+                    Installation" column.
+                    This will open Unity Hub and allow you to install the Android build tools as well.
+                </p>
+                <img src="/static/images/libunity/archive-install.webp" alt="Unity Archive">
+                <p>
+                    Once you have selected the correct Unity version, make sure to check the "Android Build Support"
+                    option in the installation settings.
+                </p>
+                <img src="/static/images/libunity/editor-install.webp" alt="Android Build Support">
+            </section>
+
+            <section id="step-2">
+                <h2>Step 2: Create a new Unity project</h2>
+                <p>After installing Unity, open Unity Hub and create a new project.
+                    Make sure you select the right Unity version. The project template does not matter, so you
+                    can leave it as 3D (Built-in Render Pipeline).
+                </p>
+                <img src="/static/images/libunity/new-project.webp" alt="New Unity Project">
+                <p>
+                    Once the project is created, you will be taken to the Unity editor.
+                    You need to open the Project Settings, which can be found in the Edit menu at the top of the screen.
+                    Then, open the Player settings and click on the "Android" tab.
+                </p>
+                <img src="/static/images/libunity/project-settings.webp" alt="Project Settings">
+                <p>
+                    In the Player settings, scroll down and find the Scripting Backend. You need to change the
+                    "Scripting Backend" to "IL2CPP" and the "Target Architectures" to "ARMv7" and "ARM64".
+                </p>
+                <img src="/static/images/libunity/player-settings.webp" alt="Player Settings">
+                <p>
+                    Next, you need to scroll down to "Optimization" and enable "Strip Engine Code".
+                    Then, set "Managed Stripping Level" to "High".
+                </p>
+                <img src="/static/images/libunity/optimization-settings.webp" alt="Optimization Settings">
+                <p>
+                    You can close the Project Settings window now. Next, we need to create a new file in the Assets
+                    folder called "link.xml".
+                    This file tells Unity what modules to keep in the libunity.so file.
+                </p>
+                <p>
+                    Right click on the Assets folder in the Project window, select "Show In Explorer", and create a new
+                    file called "link.xml".
+                </p>
+                <img src="/static/images/libunity/link-xml-file.webp" alt="Link XML">
+                <p>
+                    Open the link.xml file in a text editor. The exact content of the file depends on the error you are
+                    getting,
+                    but you can start by adding the following content, then removing erroring modules:
+                </p>
+                <button class="copy-button"
+                    onclick="navigator.clipboard.writeText(document.getElementById('link-xml').textContent)">Copy to
+                    Clipboard</button>
+                <pre><code id="link-xml">&lt;linker&gt;
+    &lt;assembly fullname=&quot;UnityEngine.AccessibilityModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.AIModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.AndroidJNIModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.AnimationModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.ARModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.AssetBundleModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.AudioModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.ClothModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.ContentLoadModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.CoreModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.CrashReportingModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.DirectorModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.DSPGraphModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.GameCenterModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.GIModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.GridModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.HotReloadModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.ImageConversionModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.IMGUIModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.InputLegacyModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.InputModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.JSONSerializeModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.LocalizationModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.ParticleSystemModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.PerformanceReportingModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.Physics2DModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.PhysicsModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.ProfilerModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.PropertiesModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.ScreenCaptureModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.SharedInternalsModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.SpriteMaskModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.SpriteShapeModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.StreamingModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.SubstanceModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.SubsystemsModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.TerrainModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.TerrainPhysicsModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.TextCoreFontEngineModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.TextCoreTextEngineModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.TextRenderingModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.TilemapModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.TLSModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UIElementsModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UIModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UmbraModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UnityAnalyticsCommonModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UnityAnalyticsModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UnityConnectModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UnityCurlModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UnityTestProtocolModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UnityWebRequestAssetBundleModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UnityWebRequestAudioModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UnityWebRequestModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UnityWebRequestTextureModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.UnityWebRequestWWWModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.VehiclesModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.VFXModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.VideoModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.VRModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.WindModule&quot; preserve=&quot;all&quot;/&gt;
+    &lt;assembly fullname=&quot;UnityEngine.XRModule&quot; preserve=&quot;all&quot;/&gt;
+&lt;/linker&gt;</code></pre>
+
+                <p>
+                    <strong>Note:</strong> Some modules depend on other modules, so you may have to remove more modules
+                    than the error suggests.
+                    For example, "UnityEngine.XRModule" depends on "UnityEngine.InputModule", so if you remove
+                    "UnityEngine.InputModule",
+                    you also need to remove "UnityEngine.XRModule".
+                </p>
+
+                <section id="step-3">
+                    <h2>Step 3: Build the custom libunity.so</h2>
+                    <p>Now that you have created the link.xml file, you can build the custom libunity.so file.
+                        To do this, go to the Build Settings in the File menu at the top of the screen.
+                    </p>
+                    <p>
+                        Make sure you switch the platform to Android by selecting "Android" in the Platform list and
+                        clicking the "Switch Platform" button.
+                    </p>
+                    <img src="/static/images/libunity/build-settings.webp" alt="Build Settings">
+                    <p>
+                        After switching the platform, you can click the "Build" button to build the project.
+                        You will be prompted to select a folder to save the build files.
+                        Create a new folder called "build" in the project directory and select it.
+                    </p>
+                    <p>
+                        The build process will take a while, depending on your computer's performance.
+                        Once it is complete, open the folder you selected. There should be an APK file.
+                        Now you need to extract the APK file to get the libunity.so file.
+                    </p>
+                    <p>
+                        You can use an extractor like 7-Zip or rename the APK file to .zip and extract it using your
+                        file manager.
+                    </p>
+                    <div class="side-by-side">
+                        <img src="/static/images/libunity/rename.webp" alt="Rename APK to ZIP">
+                        <img src="/static/images/libunity/extract.webp" alt="Extract APK">
+                    </div>
+                    <p>
+                        Once you have extracted the APK, navigate to the "lib" folder.
+                        Then, open the "arm64-v8a" or "armeabi-v7a" folder, depending on the architecture of the game
+                        you are modding.
+                        Inside, you will find the libunity.so file.
+                    </p>
+                    <img src="/static/images/libunity/libunity-folder.webp" alt="libunity.so File">
+
+                    <p>
+                        You can now copy this libunity.so file to your modding project, replacing the existing
+                        libunity.so file.
+                        Make sure to back up the original libunity.so file before replacing it.
+                    </p>
+                </section>
+
+                <section id="step-4">
+                    <h2>Step 4: Test the custom libunity.so</h2>
+                    <p>After replacing the libunity.so file, you can test your modding project to see if the error is
+                        resolved.
+                        If you still encounter the same error, you may need to go back to the link.xml file and remove
+                        more modules.
+                    </p>
+
+                    <p>
+                        If you are still having issues, contact the modding community for the game you are modding.
+                        They may have more information on what modules are necessary for the game to run properly.
+                    </p>
+                    <p>
+                        You can also contact me, <a href="https://github.com/XtraCube">XtraCube</a> on GitHub or
+                        Discord, for further assistance.
+                    </p>
+                </section>
+        </article>
+    </main>
+    <footer>
+        <button id="back-to-top">Back to Top</button>
+        <p>&copy; 2025 XtraCube. All rights reserved.</p>
+    </footer>
+</body>
+<script>
+    // Show/hide back-to-top button with animation
+    const backToTop = document.getElementById('back-to-top');
+    window.addEventListener('scroll', function () {
+        if (window.scrollY > 100) {
+            backToTop.classList.add('visible');
+        } else {
+            backToTop.classList.remove('visible');
+        }
+    });
+    backToTop.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    // Smooth scroll for header links
+    document.querySelectorAll('header nav a[href^="#"]').forEach(link => {
+        link.addEventListener('click', function (e) {
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+
+    // Copy-to-clipboard confirmation animation
+    document.querySelectorAll('.copy-button').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.classList.remove('copied');
+            }, 900);
+        });
+    });
+</script>
+</body>
+
+</html>

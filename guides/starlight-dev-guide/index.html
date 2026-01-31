@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Porting Among Us mods to Starlight</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A developer guide for porting BepInEx Among Us mods to Starlight for Android.">
+    <link type="text/css" rel="stylesheet" href="/static/styles/guides.css">
+</head>
+
+<body>
+    <header>
+        <h1>Porting Among Us mods to Starlight</h1>
+        <nav>
+            <ul>
+                <li><a href="#prerequisites">Prerequisites</a></li>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#adapting-your-mod">Adapting Your Mod</a></li>
+                <li><a href="#building">Building for Android</a></li>
+                <li><a href="#testing">Testing</a></li>
+                <li><a href="#resources">Resources</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="prerequisites">
+            <h2>Prerequisites</h2>
+            <ul>
+                <li>Basic knowledge of C# and BepInEx modding</li>
+                <li>Access to the mod source code</li>
+                <li>Development environment (e.g., Visual Studio, Rider)</li>
+            </ul>
+        </section>
+
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>
+                Starlight is an Android app that allows you to run BepInEx mods for Among Us on Android devices.
+                However, there are some notable differences between PC Among Us and Android Among Us that you
+                need to consider when porting your mod. This guide will walk you through the key steps and
+                considerations
+                for successfully porting your mod to Starlight.
+            </p>
+        </section>
+
+        <section id="adapting-your-mod">
+            <h2>Adapting Your Mod</h2>
+            <p>
+                When adapting your mod for Starlight, there are several important factors to consider:
+            </p>
+            <ul>
+                <li>File Paths</li>
+                <li>Assets</li>
+                <li>Code Differences</li>
+                <li>Platform Differences</li>
+                <li>Input Handling</li>
+                <li>Performance Considerations</li>
+            </ul>
+
+            <h3>File Paths</h3>
+            <p>
+                The most important step for Android compatiblity is to ensure that you do not use
+                file paths incorrectly. Since Among Us on PC is only available on Windows, many mods
+                use Windows-style file paths, which will not work on Android. Take the following code
+                for example:
+            </p>
+            <pre><code>string dataPath = "/MyModData";</code></pre>
+            <p>
+                On PC, this path will resolve to the "MyModData" folder in the root of the Among Us installation
+                directory.
+                However, on Android, this path will not resolve correctly, and your mod will likely fail to load or
+                function properly.
+                To fix this, you should use relative paths or Android-compatible paths. For example:
+            </p>
+            <pre><code>// Use Unity's Application.persistentDataPath
+string dataPath = Path.Combine(Application.persistentDataPath, "MyModData");</code></pre>
+            <p>
+                Relative paths are discouraged on Android, as the working directory may not be what you expect.
+                Using Unity's Application.persistentDataPath ensures that mod files are stored in a location that is
+                accessible and appropriate for Android devices.
+            </p>
+            <p>
+                The other kind of paths you should be careful about are BepInEx Paths. BepInEx provides
+                a static Paths class that contains various paths used by BepInEx. However, some of these paths
+                may not be writable or safe for mods to use on Starlight. For example, the Paths.GameRootPath
+                is not writable on Starlight, so you should avoid using it for storing mod data. Instead, consider using
+                Paths.ConfigPath, which resolves to Starlight's configuration directory, or
+                Application.persistentDataPath.
+            </p>
+
+            <h3>Assets</h3>
+            <p>
+                Unity assets that are packed into asset bundles or addressables must be rebuilt for Android.
+                PC-built asset bundles are not compatible with Android due to Unity constraints. You will need to
+                rebuild your asset bundles with the Android target platform selected in Unity.
+            </p>
+            <p>
+                Usually, assets loaded from embedded resources or files do not need to be changed,
+                but you should still verify that they work correctly on Android. Be mindful of
+                how much memory your assets use, as Android devices typically have less RAM than PCs.
+            </p>
+
+            <h3>Code Differences</h3>
+            <p>
+                Due to how the Android version of Among Us is built, there are some differences in the
+                Among Us codebase that may affect your mod. For example, the method IntroCutscene.OnDestroy
+                is not present in the Android version of Among Us. If your mod relies on this method,
+                you will need to find an alternative approach. To test compile-time differences, you can temporarily
+                switch your project to reference the AmongUs.GameLibs.Android NuGet package from BepInEx. This
+                package contains the Android version of the Among Us assemblies, allowing you to catch any
+                compilation errors before deploying to an Android device. There is a known issue with the
+                Android assemblies where compiler-generated MoveNext methods are missing, but they do exist
+                in the actual game. You can ignore these specific errors.
+            </p>
+            <p>
+                Releasing two separate builds of your mod, one for PC and one for Android, can be tedious.
+                We recommend developing cross-platform mods that can run on both PC and Android with a single build.
+                You can use System.Reflection to check for the existence of methods or properties at runtime,
+                allowing your mod to adapt its behavior at runtime. For example, Mira API's IntroCutscene.OnDestroy
+                patch checks for the existence of the OnDestroy method and uses a fallback if it is not found.
+                You can view this implementation
+                <a
+                    href="https://github.com/All-Of-Us-Mods/MiraAPI/blob/50030c113bf54cf050cccdd88c407572e047b6ac/MiraAPI/Patches/IntroCutscenePatches.cs#L89">
+                    here.
+                </a>
+            </p>
+            <p>
+                Many compiler-generated classes, such as those related to coroutines, are different
+                between PC and Android. If your mod interacts with these classes, you may need to
+                adjust your code accordingly. You can use reflection to dynamically resolve and
+                interact with these classes at runtime.
+                <a href="https://github.com/NuclearPowered/Reactor/pull/98">
+                    This Reactor PR
+                </a>
+                demonstrates how to dynamically resolve compiler-generated coroutine classes for compatibility across
+                platforms.
+            </p>
+            <p>
+                Another tool to help develop cross-platform mods is the OperatingSystem class from
+                System.Runtime.InteropServices.
+                This class allows you to check the current platform at runtime, enabling you to implement
+                platform-specific logic in your mod. For example:
+            </p>
+            <pre><code>if (OperatingSystem.IsAndroid())
+{
+    // Android-specific code
+}
+else
+{
+    // PC-specific code
+}</code></pre>
+            <p>
+                Reactor uses this approach to load platform-specific asset bundles, as shown
+                <a
+                    href="https://github.com/NuclearPowered/Reactor/blob/master/Reactor/Utilities/AssetBundleManager.cs#L46">
+                    here.
+                </a>
+            </p>
+            <p>
+                By leveraging reflection and platform checks, you can create mods that seamlessly operate
+                across both PC and Android platforms without the need for separate builds.
+            </p>
+
+            <h3>Platform Differences</h3>
+            <p>
+                Among Us is an IL2CPP game, which makes our lives as developers hell. Throwing Android
+                into the mix makes it even worse. Not only do we have to deal with IL2CPP, but
+                we also have to deal with the differences between ARM and x86 architectures.
+            </p>
+            <p>
+                Luckily, most of this is abstracted away by Starlight and BepInEx. However, there are
+                still some things to be aware of. PC Among Us is typically resilient to bad programming
+                from mod developers, so memory corruption bugs may go unnoticed. However, on Android,
+                these bugs can lead to crashes or unexpected behavior. You should be careful with
+                any IL2CPP interop code, as it is more likely to cause issues on Android.
+                Additionally, patching certain methods causes crashes and instability.
+                These methods can be manually stabilized by Starlight, but we don't know which
+                ones ahead of time. If you encounter crashes related to method patching,
+                consider reaching out to us for assistance.
+            </p>
+            <p>
+                Another change to consider is the .NET runtime. Starlight uses .NET 10, while PC
+                BepInEx is still on .NET 6. Additionally, Starlight uses the reorganized MonoMod
+                libraries, unlike PC BepInEx which still uses Legacy MonoMod. Most mods should
+                not be affected by these changes, but if your mod relies on specific .NET or MonoMod APIs,
+                you may need to update your code. For example, Legacy MonoMod's Detour class is not
+                present in the reorganized MonoMod. Instead, you should use the Hook class, which exists
+                in both versions of MonoMod.
+            </p>
+
+            <h3>Input Handling</h3>
+            <p>
+                Input handling on Android is different from PC due to the touch-based interface.
+                If your mod relies on keyboard or mouse input, you will need to implement alternative
+                input methods for Android. Consider using touch gestures or on-screen buttons to
+                replicate the functionality of keyboard and mouse inputs. For example, MoveMod has
+                platform-specific input handling to support both PC and Android controls.
+                You can view the implementation
+                <a
+                    href="https://github.com/OvernightAU/MoveMod/blob/9b4e2c8ce1418d497433f49eff5a1a2e148bb252/MoveModPublic/Modules/MoveWithMouse.cs#L23">
+                    here.
+                </a>
+            </p>
+            <p>
+                Additionally, be mindful of the different screen sizes and resolutions on Android devices.
+                Ensure that any UI elements added by your mod are responsive and adapt to various screen
+                configurations.
+            </p>
+
+            <h3>Performance Considerations</h3>
+            <p>
+                Android devices are typically weaker than PCs, so performance is a crucial consideration
+                when porting your mod. Android devices have less RAM and slower CPUs compared to PCs,
+                so optimize your mod to minimize resource usage.
+            </p>
+            <p>
+                Try to avoid doing too much work in a single frame, as this can lead to dropped frames and
+                a poor user experience. Instead, spread out work over multiple frames using coroutines
+                or background threads where appropriate.
+            </p>
+            <p>
+                Also try to minimize memory allocations, as frequent allocations can lead to garbage collection
+                pauses. Reuse objects where possible and consider using object pools for frequently used
+                objects. Resource loading should also be optimized. Optimize asset sizes and use efficient loading
+                techniques to reduce load times and memory usage.
+            </p>
+            <p>
+                Using profiling tools on your PC builds can help identify performance bottlenecks before deploying
+                to Android. Rider and Visual Studio both have built-in profiling tools that can help you analyze
+                CPU and memory usage. Additionally, dotMemory and dotTrace from JetBrains can provide
+                more in-depth profiling capabilities. The two most important metrics to monitor are
+                CPU usage and memory usage. High CPU usage can lead to dropped frames and stuttering,
+                while high memory usage can lead to crashes due to Android's memory constraints.
+            </p>
+            <p>
+                By optimizing your mod for performance, you can ensure a smooth and enjoyable experience
+                for users on Android devices.
+            </p>
+        </section>
+
+        <section id="building">
+            <h2>Building for Android</h2>
+            <p>
+                Since .NET is cross-platform, you probably don't need to change your build process.
+                However, ensure that your build is not limited to a specific target or architecture.
+                You should build an AnyCPU DLL for at least .NET 6 or higher. .NET is backward compatible,
+                so a .NET 10 runtime can usually run .NET 6 assemblies without issues.
+            </p>
+            <p>
+                If you choose to build separate versions of your mod for PC and Android, you can set up
+                different build configurations in your IDE or use conditional compilation symbols
+                to manage platform-specific code. For example, you can define a symbol "ANDROID"
+                for Android builds and use #if ANDROID directives in your code to include or exclude
+                platform-specific code. For an example, see older versions of
+                <a
+                    href="https://github.com/All-Of-Us-Mods/LaunchpadReloaded/blob/2dc98892063e706d87641e176e74ffd2e2073059/LaunchpadReloaded/LaunchpadReloaded.csproj">
+                    LaunchpadReloaded.
+                </a>
+            </p>
+        </section>
+
+        <section id="testing">
+            <h2>Testing</h2>
+            <p>
+                Unfortunately, for security reasons, public Starlight builds do not support
+                loading unapproved mods. To test your mod during development, you have two options:
+            </p>
+            <ul>
+                <li>
+                    Send test builds of your mod to AOU Staff for approval and testing.
+                </li>
+                <li>
+                    Join the Starlight Beta Tester team to gain access to special builds that allow
+                    loading unapproved mods.
+                </li>
+            </ul>
+            <p>
+                Both options require you to be a member of the All Of Us server on Discord.
+                You can join the server
+                <a href="https://discord.gg/FYYqJU2bvp">here</a>.
+            </p>
+            <p>
+                Once you have a test build of your mod running on Starlight, thoroughly verify its
+                functionality. Test all features and interactions to ensure everything works as expected.
+                Pay special attention to performance and stability, as Android devices may have
+                different capabilities compared to PCs. Monitor for any crashes or errors, and use
+                logging to help diagnose issues.
+            </p>
+        </section>
+
+        <section id="resources">
+            <h2>Resources</h2>
+            <p>
+                Porting mods to Starlight can be challenging, but with the right resources,
+                you can successfully adapt your mod for Android. Here are some useful links to
+                help you along the way:
+            </p>
+            <ul>
+                <li><a href="https://reactor.gg/discord">Reactor Discord</a></li>
+                <li><a href="https://discord.gg/FYYqJU2bvp">All Of Us Discord</a></li>
+                <li><a href="https://allofus.dev/il2cpp.html">IL2CPP Usage Analyzer</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <button id="back-to-top">Back to Top</button>
+        <p>&copy; 2026 XtraCube. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Show/hide back-to-top button with animation
+        const backToTop = document.getElementById('back-to-top');
+        window.addEventListener('scroll', function () {
+            if (window.scrollY > 100) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+        backToTop.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        // Smooth scroll for header links
+        document.querySelectorAll('header nav a[href^="#"]').forEach(link => {
+            link.addEventListener('click', function (e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
+</section>
