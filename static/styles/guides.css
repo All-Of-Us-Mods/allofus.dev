@@ -229,3 +229,22 @@ code {
 footer p {
   text-align: center;
 }
+
+@media (max-width: 600px) {
+  header h1 {
+    font-size: 1.2rem;
+    padding: 0 4px;
+  }
+  header nav ul {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    padding-bottom: 4px;
+  }
+  header nav ul li {
+    flex: 0 0 auto;
+  }
+}
