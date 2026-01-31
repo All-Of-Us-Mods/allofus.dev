@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IL2CPP Mono Method Analyzer</title>
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles/il2cpp.css" />
+</head>
+
+<body>
+  <div class="header">
+    <h1>
+      IL2CPP Mono Methods Analyzer
+    </h1>
+    <button type="button" id="helpBtn" class="button-base help-button">❔</button>
+    <div class="base-window hidden" id="help-window">
+      <div class="window-header no-move">
+        <span class="window-title">Help</span>
+        <span class="window-close">×</span>
+      </div>
+      <div class="help-window-body window-body">
+        <h2>How to Use</h2>
+        <ol>
+          <li>Click "Select Version" to choose an existing game version or "Choose JSON File" to upload your own
+            IL2CPP JSON file.</li>
+          <li>Use the search boxes and filters to narrow down the list of methods based on your criteria.</li>
+          <li>Click on column headers to sort the methods by that column.</li>
+          <li>The count display shows the number of methods currently visible out of the total loaded.</li>
+          <li>Click on a method to view more details about where it is called.</li>
+        </ol>
+        <h2>Counts Explained</h2>
+        <ul>
+          <li><strong>Mono Count:</strong> The amount of times the method is called in the original C# assembly.</li>
+          <li><strong>Xref Count:</strong> The amount of cross-references to the method in the IL2CPP binary.
+            <ul>
+              <li>It is possible for a method to be called dynamically, like abstract or interface methods. Dynamic calls don't count towards the Xref count.</li>
+            </ul>
+          </li>
+          <li><strong>This Count:</strong> The amount of times the method references the "this" object in the C# assembly.
+            <ul>
+              <li>
+                This counts were not analyzed before 17.0.1, so older versions will show 0 for all methods.
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <h2>Filters Explained</h2>
+        <ul>
+          <li><strong>Search Methods:</strong> Filter methods by name.</li>
+          <li><strong>Search Return Types:</strong> Filter methods by their return type.</li>
+          <li><strong>Method Filter:</strong> Open advanced filtering options for method names.</li>
+          <li><strong>Toggle Buttons:</strong> Enable or disable filters for compiler-generated and generic methods.</li>
+          <li><strong>Min/Max Counts:</strong> Set minimum and maximum thresholds for Mono, Xref, and This counts.</li>
+          <li><strong>Tag and Type Filters:</strong> Select specific tags and types to filter methods accordingly.</li>
+        </ul>
+        <h2>Tags Explained</h2>
+        <ul>
+          <li><strong>Inlined:</strong> Methods that have been inlined by the compiler. These are usually not safe to patch, but are okay to call.
+            <ul>
+              <li>Inlined methods usually have higher Mono counts than Xref counts.</li>
+              <li>Not all methods tagged as inlined are actually inlined. Some methods may be falsely tagged due to limitations in analysis (like dynamic calls).</li>
+            </ul>
+          </li>
+          <li><strong>Used by Inlined:</strong> Methods that are used by inlined methods. Helpful to identify possibly inlined methods. These methods are typically safe to patch and call.
+            <ul>
+              <li>Methods called by inlined methods may have higher Mono counts than Xref counts.</li>
+            </ul>
+          </li>
+          <li><strong>Stripped:</strong> Methods that have been stripped from the build. These methods are not safe to patch or call. The code no longer exists in the game.</li>
+          <li><strong>Matched:</strong> Methods that have been matched to their IL2CPP counterparts. These methods are typically safe to patch and call.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="upload-inputs">
+    <button type="button" class="button-base blue-btn" id="browseVersions">🔍 Select Version</button>
+    <label for="fileInput" class="button-base">📁 Choose JSON File<input type="file" id="fileInput"
+        accept="application/json" hidden /></label>
+    <span id="selectedFileName" class="filename-text"></span>
+    <button id="toggleThemeBtn" class="button-base">🌓 Toggle Theme</button>
+  </div>
+
+  <div class="filters">
+    <input class="filter-items" type="text" id="searchInput" placeholder="Search methods..." />
+    <input class="filter-items" type="text" id="returnTypeInput" placeholder="Search return types..." />
+
+    <button type="button" id="advSearch" class="button-base filter-button blue-btn">⚙️ Method Filter</button>
+
+    <div class="break"></div>
+
+    <button id="showCompilerGenerated" class="button-base filter-button toggle-button toggled">
+      <span class="checkbox-icon">✔</span>
+      Compiler Generated Methods
+    </button>
+    <button id="generic" class="button-base filter-button toggle-button toggled">
+      <span class="checkbox-icon">✔</span>
+      Generic Methods
+    </button>
+
+    <input class="filter-items" type="number" id="minMonoCount" placeholder="Min Mono Count" min="0" />
+    <input class="filter-items" type="number" id="maxMonoCount" placeholder="Max Mono Count" />
+
+    <input class="filter-items" type="number" id="minXrefCount" placeholder="Min Xref Count" min="0" />
+    <input class="filter-items" type="number" id="maxXrefCount" placeholder="Max Xref Count" />
+
+    <input class="filter-items" type="number" id="minThisCount" placeholder="Min This Count" min="0" />
+    <input class="filter-items" type="number" id="maxThisCount" placeholder="Max This Count" />
+
+    <div class="filter-items multi-filter" id="tagFilter">
+      <button type="button" class="button-base multi-filter-toggle" id="tagFilterToggle">Filter Tags ▾</button>
+      <div class="multi-filter-dropdown hidden" id="tagFilterDropdown">
+        <button type="button" class="button-base toggle-button toggled" data-filter="inlined">
+          <span class="checkbox-icon">✔</span>
+          Inlined
+        </button>
+        <button type="button" class="button-base toggle-button toggled" data-filter="used-by-inline">
+          <span class="checkbox-icon">✔</span>
+          Used by Inlined
+        </button>
+        <button type="button" class="button-base toggle-button toggled" data-filter="stripped">
+          <span class="checkbox-icon">✔</span>
+          Stripped
+        </button>
+        <button type="button" class="button-base toggle-button toggled" data-filter="matched">
+          <span class="checkbox-icon">✔</span>
+          Matched
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-items multi-filter" id="typeFilter">
+      <button type="button" class="button-base multi-filter-toggle" id="typeFilterToggle">Filter Types ▾</button>
+      <div class="multi-filter-dropdown hidden" id="typeFilterDropdown">
+        <button type="button" class="button-base toggle-button toggled" data-filter="Method">
+          <span class="checkbox-icon">✔</span>
+          Method
+        </button>
+        <button type="button" class="button-base toggle-button toggled" data-filter="Property">
+          <span class="checkbox-icon">✔</span>
+          Property
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="countDisplay" class="count-display">0/0</div>
+  <div class="table-scroll-wrapper">
+    <div class="virtual-table">
+      <div class="virtual-header">
+        <div class="cell col-method" data-sort="method">Method</div>
+        <div class="cell col-return" data-sort="returnType">Return Type</div>
+        <div class="cell col-count" data-sort="monoCount">Mono Count</div>
+        <div class="cell col-count" data-sort="xrefCount">Xref Count</div>
+        <div class="cell col-count" data-sort="thisCount">This Count</div>
+        <div class="cell col-type" data-sort="type">Type</div>
+        <div class="cell col-tag" data-sort="tags">Tag</div>
+      </div>
+      <div id="virtual-viewport" class="virtual-viewport">
+        <div id="virtual-spacer" class="virtual-spacer"></div>
+        <div id="virtual-content" class="virtual-content"></div>
+      </div>
+    </div>
+  </div>
+  <div id="advWindow" class="base-window hidden">
+    <div class="window-header">
+      <span class="window-title">Advanced Method Filter</span>
+      <span class="window-close">×</span>
+    </div>
+    <div class="adv-window-body window-body">
+      <textarea spellcheck="false" id="advMethodInput" rows="5"
+        placeholder="Enter method names, one per line..."></textarea>
+      <button id="advMethodApply" class="button-base blue-btn">Apply Filter</button>
+      <button id="advMethodClear" class="button-base red-btn">Clear Filter</button>
+    </div>
+    <div class="resize-handle"></div>
+  </div>
+  <div id="versionsWindow" class="base-window no-resize version-window">
+    <div class="window-header no-move">
+      <span class="window-title">Select Game Version</span>
+      <span class="window-close">×</span>
+    </div>
+    <div class="version-window-body window-body">
+      <div id="versionsList" class="versions-list">
+      </div>
+    </div>
+  </div>
+  <div id="fullDropZone" class="full-drop-zone">
+    <div class="drop-zone-message">📁 Drop your JSON file to load</div>
+  </div>
+  <script src="/static/js/il2cpp.js?v=7"></script>
+</body>
+
+</html>
