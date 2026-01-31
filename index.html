@@ -8,45 +8,64 @@
     <link type="text/css" rel="stylesheet" href="static/styles/index.css">
 </head>
 <body>
-    <img class="bg-img" src="static/images/background.webp" alt="Among Us themed background">
     <div class="container">
-        <h1>All Of Us Mods</h1>
-        <p>Welcome to the official website of All Of Us Mods. We create innovative and high-quality mods for the game Among Us.</p>
-
-        <div class="row">
-            <div class="col">
-                <h2>Our Products</h2>
-                <a href="https://github.com/All-Of-Us-Mods/MiraAPI" target="_blank" class="card-link-wrapper">
-                    <div class="card">
-                        <h3>Mira API</h3>
-                        <p>A comprehensive yet easy-to-use Among Us Modding API.</p>
-                        <span class="card-link">Learn More</span>
+        <header>
+            <nav>
+                <div class="nav-container">
+                    <h1>All Of Us Mods</h1>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/starlight">Starlight</a></li>
+                        <li><a href="/il2cpp">IL2CPP Tools</a></li>
+                        <li><a href="/guides">Guides</a></li>
+                        <li><a href="/privacy-policy">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <main>
+            <section id="features" class="features">
+                <div class="features-container">
+                    <div class="feature-card">
+                        <div class="project">
+                            <h3>Starlight</h3>
+                            <p>Android mod launcher for Among Us. Easy installation, mobile-optimized, regular updates.</p>
+                            <a href="/starlight" class="btn primary">Get Starlight</a>
+                        </div>
+                        <div class="project">
+                            <h3>Launchpad Reloaded</h3>
+                            <p> A vanilla oriented, fun, and unique Among Us client mod. </p>
+                            <a href="https://github.com/All-Of-Us-Mods/LaunchpadReloaded" class="btn primary">Get Launchpad Reloaded</a>
+                        </div>
                     </div>
-                </a>
-
-                <a href="https://github.com/All-Of-Us-Mods/LaunchpadReloaded" target="_blank" class="card-link-wrapper">
-                    <div class="card">
-                        <h3>Launchpad Reloaded</h3>
-                        <p>A vanilla-oriented Among Us mod with unique features, enhancing the gameplay experience without overcomplicating it.</p>
-                        <span class="card-link">Learn More</span>
+                    <div class="feature-card">
+                        <h2>Tools & Guides</h2>
+                        <div class="tool-cards">
+                            <a href="https://github.com/All-Of-Us-Mods/MiraAPI" target="_blank" class="tool-card">
+                                <h3>Mira API</h3>
+                                <p>Modding API for Among Us.</p>
+                            </a>
+                            <a href="/il2cpp" class="tool-card">
+                                <h3>IL2CPP Tools</h3>
+                                <p>IL2CPP analysis and reverse engineering tools.</p>
+                            </a>
+                            <a href="/guides" class="tool-card">
+                                <h3>Development Guides</h3>
+                                <p>Guides for IL2CPP and Starlight development.</p>
+                            </a>
+                        </div>
                     </div>
-                </a>
-                <a href="starlight.html" target="_blank" class="card-link-wrapper">
-                    <div class="card">
-                        <h3>Starlight</h3>
-                        <p>An innovative Among Us mod launcher for Android, making it easier for mobile users to access and play with mods.</p>
-                        <span class="card-link">Learn More</span>
+                    <div class="feature-card">
+                        <h2>Community</h2>
+                        <p>Join our Discord for support, updates, and to connect with fellow modders.</p>
+                        <iframe src="https://discord.com/widget?id=1333104345906020402&theme=dark" width="100%" height="300px" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
                     </div>
-                </a>
-            </div>
-            <div class="col">
-                <h2>Our Community</h2>
-                <iframe src="https://discord.com/widget?id=1333104345906020402&theme=dark" width="100%" height="450px" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-            </div>
-        </div>
-
-        <p>Thank you for visiting All Of Us Mods. Stay tuned for more exciting updates!</p>
-        <a href="privacy-policy.html" class="card-link">Privacy Policy</a>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <p>© 2026 All Of Us Mods. <a href="/privacy-policy">Privacy Policy</a></p>
+        </footer>
     </div>
 </body>
 </html>
