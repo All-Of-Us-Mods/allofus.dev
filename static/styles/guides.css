@@ -1,3 +1,51 @@
+:root {
+  --color-bg: #f9fafb;
+  --color-bg-alt: #f4f4f4;
+  --color-header: #f9fafb;
+  --color-header-border: #e0e0e0;
+  --color-border: #e0e0e0;
+  --color-text: #222;
+  --color-text-secondary: #444;
+  --color-heading: #222;
+  --color-link: #007bff;
+  --color-link-hover: #0056b3;
+  --color-link-bg-hover: #e6f0ff;
+  --color-footer-bg: #f4f4f4;
+  --color-footer: #f4f4f4;
+  --color-code-bg: #23272e;
+  --color-code-text: #e6e6e6;
+  --color-inline-code: #ffb86c;
+  --color-copy-btn: #007bff;
+  --color-copy-btn-success: #28a745;
+  --color-copy-btn-copied: #28a745;
+  --color-backtotop-bg: #007bff;
+  --color-backtotop-text: #fff;
+}
+
+body.dark-mode {
+  --color-bg: #181a1b;
+  --color-bg-alt: #23272e;
+  --color-header: #23272e;
+  --color-header-border: #222326;
+  --color-border: #222326;
+  --color-text: #e6e6e6;
+  --color-text-secondary: #bdbdbd;
+  --color-heading: #ffffff;
+  --color-link: #7abaff;
+  --color-link-hover: #4a90e2;
+  --color-link-bg-hover: #263445;
+  --color-footer-bg: #23272e;
+  --color-footer: #23272e;
+  --color-code-bg: #2a2d32;
+  --color-code-text: #e6e6e6;
+  --color-inline-code: #ffd580;
+  --color-copy-btn: #4a90e2;
+  --color-copy-btn-success: #28a745;
+  --color-copy-btn-copied: #28a745;
+  --color-backtotop-bg: #4a90e2;
+  --color-backtotop-text: #fff;
+}
+
 #back-to-top {
   position: fixed;
   bottom: 32px;
@@ -7,7 +55,7 @@
   z-index: 1000;
   border: none;
   border-radius: 6px;
-  background: #007bff;
+  background: var(--color-link);
   color: #fff;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -24,15 +72,6 @@
   pointer-events: auto;
 }
 
-#back-to-top {
-  opacity: 0;
-  transform: translateY(30px);
-  transition:
-    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-}
-
 #back-to-top.visible {
   opacity: 1;
   transform: translateY(0);
@@ -47,7 +86,7 @@
 }
 
 .copy-button.copied {
-  background-color: #28a745 !important;
+  background-color: var(--color-copy-btn-copied) !important;
   color: #fff !important;
   transform: scale(1.08);
 }
@@ -64,6 +103,7 @@ html {
 }
 
 body {
+  background: var(--color-bg);
   font-family: Arial, sans-serif;
   line-height: 1.6;
   margin: 0;
@@ -81,9 +121,9 @@ main {
 }
 
 header {
-  background: #f9fafb;
+  background: var(--color-header);
   padding: 24px 20px 12px 20px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
   z-index: 1100;
@@ -94,7 +134,7 @@ header {
 header h1 {
   margin: 0 0 16px 0;
   font-size: 2rem;
-  color: #222;
+  color: var(--color-text);
   text-align: center;
 }
 
@@ -114,7 +154,7 @@ header nav ul li {
 
 header nav ul li a {
   text-decoration: none;
-  color: #007bff;
+  color: var(--color-link);
   font-weight: 500;
   padding: 6px 12px;
   border-radius: 4px;
@@ -125,14 +165,14 @@ header nav ul li a {
 
 header nav ul li a:hover,
 header nav ul li a:focus {
-  background: #e6f0ff;
-  color: #0056b3;
+  background: var(--color-link-bg-hover);
+  color: var(--color-link-hover);
 }
 
 footer {
   text-align: center;
   padding: 10px;
-  background: #f4f4f4;
+  background: var(--color-footer);
   position: relative;
   bottom: 0;
   width: 100%;
@@ -141,15 +181,15 @@ footer {
 h1,
 h2,
 h3 {
-  color: #333;
+  color: var(--color-heading);
 }
 
 li {
-  color: #444;
+  color: var(--color-text-secondary);
 }
 
 p {
-  color: #444;
+  color: var(--color-text-secondary);
   text-align: justify;
 }
 
@@ -167,8 +207,8 @@ img {
 }
 
 pre {
-  background-color: #23272e;
-  color: #e6e6e6;
+  background-color: var(--color-code-bg);
+  color: var(--color-code-text);
   padding: 10px 14px;
   border-radius: 5px;
   max-height: 32vh;
@@ -185,12 +225,12 @@ pre code {
   background: none;
   padding: 0;
   font-size: inherit;
-  color: #e6e6e6;
+  color: var(--color-code-text);
 }
 
 code {
-  background: #23272e;
-  color: #ffb86c;
+  background: var(--color-code-bg);
+  color: var(--color-inline-code);
   padding: 2px 5px;
   border-radius: 3px;
   font-size: 0.97em;
@@ -199,7 +239,7 @@ code {
 }
 
 .copy-button {
-  background-color: #007bff;
+  background-color: var(--color-copy-btn);
   color: white;
   border: none;
   padding: 5px 10px;
@@ -247,4 +287,22 @@ footer p {
   header nav ul li {
     flex: 0 0 auto;
   }
+}
+
+#dark-mode-toggle {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: var(--color-link);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 1000;
+}
+
+#dark-mode-toggle:hover {
+  background: var(--color-link-hover);
 }
