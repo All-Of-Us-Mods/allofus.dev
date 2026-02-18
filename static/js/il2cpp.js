@@ -36,6 +36,8 @@ const tagTips = {
 
 // platform nice names
 const platformNames = {
+    "steam-x86": "Steam Windows x86 (32-bit)",
+    "steam-x86_64": "Steam Windows x86_64 (64-bit)",
     "win-x86": "Windows x86 (32-bit)",
     "win-x86_64": "Windows x86_64 (64-bit)",
     "android-arm64": "Android ARM64 (64-bit)",
