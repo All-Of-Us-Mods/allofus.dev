@@ -47,6 +47,9 @@ const platformNames = {
 // Z indexing
 let currentZ = 500
 
+// window cascade offset
+let windowCascadeIndex = 0;
+
 // setup the initial state
 setupTable();
 setupFileInput();
@@ -681,6 +684,23 @@ function createUsageWindow(methodName) {
     document.body.appendChild(windowEl);
     openWindows.add(windowId);
 
+    const cascadeStep = 30;
+    const maxCascade = 10;
+    const cascadeOffset = (windowCascadeIndex % maxCascade) * cascadeStep;
+    windowCascadeIndex++;
+
+    const winW = windowEl.offsetWidth || 600;
+    const winH = windowEl.offsetHeight || 400;
+    const viewW = window.innerWidth;
+    const viewH = window.innerHeight;
+
+    const spawnLeft = Math.min(Math.max(cascadeOffset + 60, 0), viewW - winW - 20);
+    const spawnTop = Math.min(Math.max(cascadeOffset + 60, 0), viewH - 120);
+
+    windowEl.style.left = spawnLeft + 'px';
+    windowEl.style.top = spawnTop + 'px';
+    windowEl.style.transform = 'none';
+
     setupWindowDrag(windowEl);
     setupWindowResize(windowEl, resizeHandle);
 
@@ -708,6 +728,8 @@ function setupWindowDrag(windowEl) {
             return;
         }
 
+        windowEl.style.transform = 'none';
+
         isDragging = true;
         offsetX = e.clientX - windowEl.getBoundingClientRect().left;
         offsetY = e.clientY - windowEl.getBoundingClientRect().top;
@@ -727,8 +749,11 @@ function setupWindowDrag(windowEl) {
 
         if (!isDragging) return;
 
-        windowEl.style.left = `${e.clientX - offsetX}px`;
-        windowEl.style.top = `${e.clientY - offsetY}px`;
+        const newLeft = e.clientX - offsetX;
+        const newTop = Math.max(0, e.clientY - offsetY);
+
+        windowEl.style.left = `${newLeft}px`;
+        windowEl.style.top = `${newTop}px`;
         windowEl.style.right = 'auto';
     });
 
