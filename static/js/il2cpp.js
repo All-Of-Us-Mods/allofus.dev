@@ -100,7 +100,7 @@ function setupVersionSelector() {
     });
 
     // get game version data
-    fetch('il2cpp/available_versions.json')
+    fetch('/il2cpp/available_versions.json')
         .then(response => response.json())
         .then(data => {
             Object.entries(data).forEach(([version, versionData]) => {
