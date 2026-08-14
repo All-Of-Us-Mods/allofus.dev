@@ -3,7 +3,8 @@
     "game_version": "17.4.0",
     "release_date": "2026-06-05",
     "analyses": {
-      "steam-x86": "2026.6.5/method_analysis_steam_x86.json"
+      "steam-x86": "2026.6.5/method_analysis_steam_x86.json",
+      "android-arm64": "2026.6.5/method_analysis_android_arm64.json"
     }
   },
   "2026.2.17": {
