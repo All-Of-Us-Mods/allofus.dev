@@ -76,10 +76,11 @@
                 To fix this, you should use relative paths or Android-compatible paths. For example:
             </p>
             <pre><code>// Use Unity's Application.persistentDataPath
-string dataPath = Path.Combine(Application.persistentDataPath, "MyModData");</code></pre>
+string starDataFolder = Environment.GetEnvironmentVariable("STAR_DATA_PATH");
+string dataPath = Path.Combine(starDataFolder, "MyModData");</code></pre>
             <p>
                 Relative paths are discouraged on Android, as the working directory may not be what you expect.
-                Using Unity's Application.persistentDataPath ensures that mod files are stored in a location that is
+                Using STAR_DATA_PATH or Unity's Application.persistentDataPath ensures that mod files are stored in a location that is
                 accessible and appropriate for Android devices.
             </p>
             <p>
@@ -87,8 +88,8 @@ string dataPath = Path.Combine(Application.persistentDataPath, "MyModData");</co
                 a static Paths class that contains various paths used by BepInEx. However, some of these paths
                 may not be writable or safe for mods to use on Starlight. For example, the Paths.GameRootPath
                 is not writable on Starlight, so you should avoid using it for storing mod data. Instead, consider using
-                Paths.ConfigPath, which resolves to Starlight's configuration directory, or
-                Application.persistentDataPath.
+                STAR_DATA_PATH, which is a dedicated folder meant for mod data, Paths.ConfigPath,
+                which resolves to Starlight's configuration directory, or Application.persistentDataPath.
             </p>
 
             <h3>Assets</h3>
