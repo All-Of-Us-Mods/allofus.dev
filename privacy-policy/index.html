@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Privacy Policy - All Of Us Mods</title>
+  <title>Privacy Policy - Starlight: Among Us Mods</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -27,6 +27,11 @@
       color: #333;
     }
 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 1rem;
@@ -39,13 +44,13 @@
 
   <div class="privacy-container">
     <h1>Privacy Policy</h1>
-    <p><strong>Effective Date:</strong> December 23, 2025</p>
+    <p><strong>Effective Date:</strong> September 2, 2026</p>
 
     <p>
-      All Of Us Mods ("we", "our", or "us") operates the All Of Us Mods Android application
-      known as Starlight. This Privacy Policy explains how personal data is processed when
-      you use the app, in accordance with the General Data Protection Regulation (GDPR)
-      and other applicable privacy laws.
+      Starlight: Among Us Mods ("Starlight", "we", "our", or "us") is an Android application
+      that lets users install community-made mods for Among Us. This Privacy Policy explains
+      how personal data is processed when you use the app, in accordance with the General
+      Data Protection Regulation (GDPR) and other applicable privacy laws.
     </p>
 
     <h2>1. Data Controller</h2>
@@ -60,14 +65,44 @@
 
     <h2>2. What Data Is Collected</h2>
 
-    <h3>2.1 Data You Provide</h3>
+    <h3>2.1 Sign-In Data</h3>
     <p>
-      If you choose to sign in using itch.io OAuth, basic account identifiers provided
-      by itch.io may be processed for authentication purposes. We do not operate our own
-      user account system and do not store passwords.
+      Starlight requires you to sign in to play Among Us with your existing Among Us account.
+      We support the following sign-in methods:
+    </p>
+    <ul>
+      <li>
+        <strong>Google Sign-In (primary method).</strong> When you sign in with Google,
+        we receive a Google-issued identity token confirming your Google account identity.
+        This token is used to authenticate you against Among Us's backend services
+        (operated by Innersloth and its game server partners) so that your existing
+        Among Us account, purchases, and cosmetics can be used in Starlight. We do not
+        receive or store your Google password, and we do not receive access to your
+        Gmail, Drive, or other Google data beyond the basic identity confirmation needed
+        for sign-in.
+      </li>
+      <li>
+        <strong>itch.io OAuth (developer/advanced option).</strong> itch.io sign-in remains
+        available as a secondary, developer-facing option for users who have an itch.io
+        account linked to Among Us. Basic account identifiers provided by itch.io are
+        processed for authentication purposes only.
+      </li>
+    </ul>
+    <p>
+      We do not operate our own user account system and do not store passwords for any
+      sign-in method.
     </p>
 
-    <h3>2.2 Automatically Collected Data</h3>
+    <h3>2.2 Gameplay and Multiplayer Data</h3>
+    <p>
+      To connect you to Among Us multiplayer matches, Starlight exchanges your sign-in
+      token for a game authentication token, and shares this token with the multiplayer
+      server (either Innersloth's official servers or a third-party server host you
+      select) so that the server can identify your account, matchmaking status, and
+      in-game entitlements (such as owned cosmetics).
+    </p>
+
+    <h3>2.3 Automatically Collected Data</h3>
     <p>
       When you use the app, the following data may be processed:
     </p>
@@ -75,6 +110,7 @@
       <li>An anonymous, app-generated tracking identifier used solely to count content downloads</li>
       <li>Technical data such as app version, device type, and operating system version</li>
       <li>Crash and diagnostic data collected via Firebase Crashlytics</li>
+      <li>Advertising identifiers and interaction data processed via Google AdMob</li>
     </ul>
 
     <p>
@@ -87,9 +123,9 @@
       Data is collected when you:
     </p>
     <ul>
-      <li>Use the app to download content from our backend server</li>
+      <li>Sign in using Google or itch.io</li>
+      <li>Use the app to download mod content from our backend server</li>
       <li>Use the app to connect to multiplayer servers</li>
-      <li>Sign in using itch.io OAuth</li>
       <li>Use the app while crash reporting or diagnostics are enabled</li>
       <li>View or interact with advertisements</li>
     </ul>
@@ -100,6 +136,10 @@
       <tr>
         <th>Purpose</th>
         <th>Legal Basis (GDPR Art. 6)</th>
+      </tr>
+      <tr>
+        <td>Google / itch.io sign-in and game authentication</td>
+        <td>Contractual necessity (Art. 6(1)(b))</td>
       </tr>
       <tr>
         <td>Content delivery and download counting</td>
@@ -116,10 +156,6 @@
       <tr>
         <td>Personalized advertising</td>
         <td>Consent (Art. 6(1)(a))</td>
-      </tr>
-      <tr>
-        <td>OAuth authentication</td>
-        <td>Contractual necessity (Art. 6(1)(b))</td>
       </tr>
     </table>
 
@@ -138,6 +174,13 @@
 
     <h2>5. Third-Party Service Providers</h2>
 
+    <h3>Google Sign-In</h3>
+    <p>
+      Starlight uses Google Sign-In to authenticate users. Google's handling of your
+      account data is governed by the
+      <a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a>.
+    </p>
+
     <h3>Google AdMob</h3>
     <p>
       The app uses Google AdMob to display advertisements. Advertising is always
@@ -153,17 +196,14 @@
 
     <p>
       Consent for personalized advertising is managed using Google's User Messaging
-      Platform (UMP).
+      Platform (UMP). For more information, see the
+      <a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a>.
     </p>
 
     <h3>Firebase Crashlytics</h3>
     <p>
       Firebase Crashlytics is used to collect crash reports and diagnostic data to
-      improve app stability and performance.
-    </p>
-
-    <p>
-      For more information on Google's data practices, see:
+      improve app stability and performance. For more information, see the
       <a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a>.
     </p>
 
@@ -173,10 +213,11 @@
       accordance with their <a href="https://itch.io/docs/legal/privacy-policy" target="_blank">privacy policy.</a>
     </p>
 
-    <h3>InnerSloth</h3>
+    <h3>Innersloth</h3>
     <p>
-      The app integrates with InnerSloth services for gameplay features related to
-      Among Us. For more information, please refer to InnerSloth's
+      Starlight integrates with Innersloth's Among Us services so that your existing
+      Among Us account, purchases, and progress can be used in the app. For more
+      information, please refer to Innersloth's
       <a href="https://www.innersloth.com/privacy-policy/" target="_blank">Privacy Policy</a>.
     </p>
 
@@ -189,7 +230,7 @@
     </p>
 
     <ul>
-      <li>InnerSloth: <a href="https://www.innersloth.com/privacy-policy/" target="_blank">Privacy Policy</a></li>
+      <li>Innersloth: <a href="https://www.innersloth.com/privacy-policy/" target="_blank">Privacy Policy</a></li>
       <li>Miniduikboot: To Be Announced</li>
       <li>NikoCat233: <a href="https://au.niko233.me/policy" target="_blank">Privacy Policy</a></li>
     </ul>
