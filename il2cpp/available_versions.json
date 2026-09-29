@@ -1,4 +1,12 @@
 {
+  "2026.9.29": {
+    "game_version": "19.0.0",
+    "release_date": "2026-09-29",
+    "analyses": {
+      "steam-x86_64": "2026.9.29/method_analysis_steam_x86_64.json",
+      "android-arm64": "2026.9.29/method_analysis_android_arm64.json"
+    }
+  },
   "2026.8.18": {
     "game_version": "18.0.0",
     "release_date": "2026-08-18",
