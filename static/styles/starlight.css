@@ -23,6 +23,7 @@ body {
   margin: 0;
   padding: 0;
   line-height: 1.6;
+  scroll-behavior: smooth;
 }
 
 .header {
@@ -34,7 +35,86 @@ body {
 .header h1 {
   font-size: 2.5rem;
   color: var(--primary);
-  margin: 0;
+  margin: 0.5rem 0 0;
+}
+
+.header-badges {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.platform-pill {
+  display: inline-block;
+  padding: 0.25rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(211, 182, 94, 0.15);
+  border: 1px solid var(--primary);
+  color: var(--onPrimaryContainer);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.header-sub {
+  max-width: 640px;
+  margin: 0.75rem auto 0;
+  color: var(--onSurface);
+  opacity: 0.9;
+}
+
+.header-cta {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+}
+
+.ghost-btn {
+  display: inline-block;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--outline);
+  color: var(--onSurface);
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.ghost-btn:hover {
+  border-color: var(--primary);
+  background: rgba(211, 182, 94, 0.12);
+}
+
+.device-hint {
+  margin: 1rem auto 0;
+  font-size: 0.9rem;
+  color: var(--onPrimaryContainer);
+  background: rgba(211, 182, 94, 0.12);
+  border: 1px dashed var(--primary);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  max-width: 560px;
+}
+
+.platform-strip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  background: var(--surfaceContainer);
+  border: 1px solid var(--surfaceContainerHigh);
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1.25rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.platform-strip .dot {
+  opacity: 0.5;
 }
 
 .tagline {
@@ -83,6 +163,113 @@ h2 {
   margin: 3rem 0;
 }
 
+.download-sub,
+.download-footnote,
+.community-sub {
+  opacity: 0.9;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.platform-toggle {
+  display: inline-flex;
+  background: var(--surfaceContainer);
+  border: 1px solid var(--surfaceContainerHigh);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+  margin: 1rem 0 1.5rem;
+}
+
+.platform-tab {
+  border: none;
+  background: transparent;
+  color: var(--onSurface);
+  font: inherit;
+  font-weight: 700;
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.platform-tab.active {
+  background: var(--primary);
+  color: var(--onPrimary);
+}
+
+.download-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  text-align: left;
+  align-items: stretch;
+  padding-top: 0.75rem;
+}
+
+.download-card {
+  position: relative;
+  background-color: var(--surfaceContainer);
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.download-card.active {
+  border-color: var(--primary);
+  box-shadow: 0 8px 28px rgba(211, 182, 94, 0.25);
+  transform: translateY(-2px);
+}
+
+.recommended-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--primary);
+  color: var(--onPrimary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.recommended-badge[hidden] {
+  display: none;
+}
+
+.download-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.download-card h3 {
+  margin: 0.5rem 0 0.25rem;
+  color: var(--primary);
+  font-size: 1.3rem;
+}
+
+.version-line {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.download-points {
+  margin: 0 0 1.25rem;
+  padding-left: 1.2rem;
+  font-size: 0.95rem;
+}
+
+.download-points li {
+  margin-bottom: 0.35rem;
+}
+
 .download-actions {
   display: flex;
   justify-content: center;
@@ -107,6 +294,46 @@ h2 {
   transform: scale(1.05);
 }
 
+.download-card .download-actions {
+  justify-content: stretch;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.download-card .download-btn {
+  text-align: center;
+  padding: 0.9rem 1.25rem;
+}
+
+.secondary-btn {
+  background-color: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+}
+
+.secondary-btn:hover {
+  background-color: rgba(211, 182, 94, 0.15);
+  color: var(--onPrimaryContainer);
+}
+
+.download-note {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin-bottom: 0;
+}
+
+.download-note code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.download-footnote {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
 .download-btn.disabled {
   pointer-events: none;
   opacity: 0.6;
@@ -117,6 +344,11 @@ h2 {
 .community {
   margin: 3rem 0;
   text-align: center;
+}
+
+.community iframe {
+  border-radius: 12px;
+  max-width: 100%;
 }
 
 .footer {
@@ -180,6 +412,18 @@ h2 {
 
 /* Mobile-friendly adjustments */
 @media (max-width: 640px) {
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .download-card {
+    padding: 1.5rem 1.25rem 1.25rem;
+  }
+
+  .platform-tab {
+    padding: 0.6rem 1rem;
+  }
+
   .release-banner {
     padding: 16px 20px;
     font-size: 1.25rem;

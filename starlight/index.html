@@ -4,24 +4,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Starlight: Among Us Mods</title>
+  <title>Starlight — Cross-Platform Among Us Mod Manager</title>
   <meta name="description"
-    content="Starlight: Among Us Mods is the first Android mod launcher for Among Us. Sign in with your existing Among Us account to install and play community mods on mobile.">
+    content="Starlight is a free, cross-platform mod manager for Among Us — available on Android and PC. Install, manage, and play community mods.">
   <link rel="shortcut icon" type="image/x-icon" href="/favicon.png">
   <link type="text/css" rel="stylesheet" href="/static/styles/starlight.css">
 </head>
 
 <body>
   <header class="header">
-    <h1>Starlight: Among Us Mods</h1>
-    <p class="tagline">The first Android mod launcher for <em>Among Us</em></p>
+    <div class="header-badges" aria-label="Supported platforms">
+      <span class="platform-pill">Android</span>
+      <span class="platform-pill">PC • Windows</span>
+    </div>
+    <h1>Starlight</h1>
+    <p class="tagline">The cross-platform mod manager for <em>Among Us</em> — one app, on phone <strong>and</strong> PC</p>
+    <p class="header-sub">Install, manage, and play community mods.</p>
+    <div class="header-cta">
+      <a href="#download" class="download-btn">Get Starlight</a>
+      <a href="#community" class="ghost-btn">Join the Discord</a>
+    </div>
   </header>
 
   <main class="container">
     <section class="intro">
       <p>
-        <strong>Starlight: Among Us Mods</strong> brings the world of <em>Among Us</em> mods to your phone.
-        Install, manage, and play with mods seamlessly on Android — no hassle, just fun.
+        <strong>Starlight</strong> brings the world of <em>Among Us</em> mods to your
+        <strong>phone and your PC</strong>. It's one cross-platform mod manager:
+        browse, install, and play community mods wherever you play.
       </p>
       <p>
         Starlight is a companion app, not a replacement for the official game. To play, you sign in
@@ -35,34 +45,74 @@
       <h2>Why Choose Starlight?</h2>
       <div class="feature-grid">
         <div class="feature-card">
+          <h3>🔄 Cross-Platform</h3>
+          <p>One mod manager for <strong>Android and PC</strong>. Pick your device below — your Among Us account goes with you.</p>
+        </div>
+        <div class="feature-card">
           <h3>🚀 Simple & Easy</h3>
-          <p>Install mods with just a few taps. No technical knowledge required.</p>
+          <p>Install mods in a few taps or clicks. No technical knowledge required.</p>
         </div>
         <div class="feature-card">
-          <h3>🌌 Community Driven</h3>
-          <p>Stay updated with the latest mods and connect with other players.</p>
-        </div>
-        <div class="feature-card">
-          <h3>🌐 Custom Game Servers</h3>
-          <p>Easily connect to custom Among Us servers for unique game modes and private matches with friends.</p>
+          <h3>🌐 Modded Matchmaking</h3>
+          <p>Easily connect to custom Among Us servers and browse active modded lobbies.</p>
         </div>
       </div>
     </section>
 
-    <section class="download">
-      <h2>Download Starlight</h2>
-      <p>Get the latest version (2.0.0) now:</p>
-      <div class="download-actions">
-        <a id="gplay-download" href="https://play.google.com/store/apps/details?id=dev.allofus.starlight"
-          target="_blank" rel="noopener" class="download-btn">Download on Google Play</a>
-        <a id="apk-download"
-          href="https://github.com/All-Of-Us-Mods/starlight-releases/releases/download/2000/starlight-2000.apk"
-          target="_blank" rel="noopener" class="download-btn">Download APK Directly</a>
+    <section class="download" id="download">
+      <h2>Get Starlight</h2>
+      <p class="download-sub">Free mod manager for <em>Among Us</em> — pick your platform.</p>
+
+      <div class="platform-toggle" role="tablist" aria-label="Choose your platform">
+        <button type="button" id="tab-android" class="platform-tab" role="tab" aria-selected="true" aria-controls="panel-android">📱 Android</button>
+        <button type="button" id="tab-pc" class="platform-tab" role="tab" aria-selected="false" aria-controls="panel-pc">💻 PC</button>
+      </div>
+
+      <div class="download-grid">
+        <article class="download-card" id="panel-android" role="tabpanel" aria-labelledby="tab-android" data-platform="android">
+          <span class="recommended-badge" id="badge-android" hidden>✨ Recommended for you</span>
+          <div class="download-icon" aria-hidden="true">📱</div>
+          <h3>Starlight for Android</h3>
+          <p class="version-line">Latest: <strong>v2.0.0</strong> • Requires Android + official Among Us app</p>
+          <ul class="download-points">
+            <li>Install & update mods in a few taps</li>
+            <li>Custom servers & private matches</li>
+            <li>Get notified of new mods and updates</li>
+          </ul>
+          <div class="download-actions">
+            <a id="gplay-download" href="https://play.google.com/store/apps/details?id=dev.allofus.starlight"
+              target="_blank" rel="noopener" class="download-btn">Get it on Google Play</a>
+            <a id="apk-download"
+              href="https://github.com/All-Of-Us-Mods/starlight-releases/releases/download/2000/starlight-2000.apk"
+              target="_blank" rel="noopener" class="download-btn secondary-btn">Download APK directly</a>
+          </div>
+          <p class="download-note">Prefer sideloading? Use the APK. Prefer auto-updates? Use Google Play.</p>
+        </article>
+
+        <article class="download-card" id="panel-pc" role="tabpanel" aria-labelledby="tab-pc" data-platform="pc">
+          <span class="recommended-badge" id="badge-pc" hidden>✨ Recommended for you</span>
+          <div class="download-icon" aria-hidden="true">💻</div>
+          <h3>Starlight for PC</h3>
+          <p class="version-line">For Windows • Get the latest release on GitHub</p>
+          <ul class="download-points">
+            <li>Same mod catalog as Android</li>
+            <li>Desktop-friendly install & management</li>
+            <li>Works with your existing Among Us account</li>
+          </ul>
+          <div class="download-actions">
+            <a id="pc-download" href="https://github.com/All-Of-Us-Mods/Starlight-PC/releases"
+              target="_blank" rel="noopener" class="download-btn">Download for PC on GitHub</a>
+            <a href="https://github.com/All-Of-Us-Mods/Starlight-PC" target="_blank" rel="noopener"
+              class="download-btn secondary-btn">View source & changelog</a>
+          </div>
+          <p class="download-note">You'll be taken to GitHub Releases — pick the newest <code>.exe</code> / setup build.</p>
+        </article>
       </div>
     </section>
 
-    <section class="community">
+    <section class="community" id="community">
       <h2>Join Our Community</h2>
+      <p class="community-sub">Questions? Mod requests? Come hang out — we support both Android and PC players.</p>
       <iframe src="https://discord.com/widget?id=1333104345906020402&theme=dark" width="100%" height="400px"
         allowtransparency="true" frameborder="0"
         sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
@@ -71,11 +121,64 @@
 
   <footer class="footer">
     <p>
-      © 2026 Starlight: Among Us Mods •
+      © 2026 Starlight • A cross-platform mod manager for Among Us (Android & PC) •
       <a href="/index.html">Home</a> •
       <a href="/privacy-policy.html">Privacy Policy</a>
     </p>
   </footer>
+
+  <script>
+    (function () {
+      var ua = (navigator.userAgent || "").toLowerCase();
+      var platform = (navigator.userAgentData && navigator.userAgentData.platform ? String(navigator.userAgentData.platform) : (navigator.platform || "")).toLowerCase();
+      var maxTouch = navigator.maxTouchPoints || 0;
+
+      function isAndroid() { return ua.indexOf("android") !== -1; }
+      function isMobileApple() { return /iphone|ipad|ipod/.test(ua) || ((platform.indexOf("mac") !== -1 || ua.indexOf("macintosh") !== -1) && maxTouch > 1); }
+      function isDesktop() {
+        return /windows|macintosh|mac os|cros|linux|x11/.test(ua + " " + platform) && !isAndroid() && !isMobileApple();
+      }
+
+      // Default: Android for phones/tablets (incl. iOS visitors who'd still want Android info),
+      // PC for desktops. Android UA => android, desktop OS => pc.
+      var detected = isAndroid() ? "android" : (isDesktop() ? "pc" : "android");
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var forced = (params.get("platform") || "").toLowerCase();
+        if (forced === "android" || forced === "pc") detected = forced;
+      } catch (e) { /* ignore */ }
+
+      var cards = {
+        android: document.getElementById("panel-android"),
+        pc: document.getElementById("panel-pc")
+      };
+      var tabs = {
+        android: document.getElementById("tab-android"),
+        pc: document.getElementById("tab-pc")
+      };
+      var badges = {
+        android: document.getElementById("badge-android"),
+        pc: document.getElementById("badge-pc")
+      };
+
+      function setActive(which) {
+        ["android", "pc"].forEach(function (key) {
+          var isActive = key === which;
+          if (cards[key]) cards[key].classList.toggle("active", isActive);
+          if (tabs[key]) {
+            tabs[key].classList.toggle("active", isActive);
+            tabs[key].setAttribute("aria-selected", isActive ? "true" : "false");
+          }
+          if (badges[key]) badges[key].hidden = !isActive;
+        });
+      }
+
+      if (tabs.android) tabs.android.addEventListener("click", function () { setActive("android"); });
+      if (tabs.pc) tabs.pc.addEventListener("click", function () { setActive("pc"); });
+
+      setActive(detected);
+    })();
+  </script>
 </body>
 
 </html>
