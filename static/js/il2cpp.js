@@ -1,3 +1,5 @@
+import { analyzeMod } from './analyzer.js';
+
 // method data
 let methodData = {};
 let allEntries = [];
@@ -169,6 +171,23 @@ function setupAdvancedMethodWindow() {
         document.getElementById("advMethodInput").value = '';
         advancedMethodLines = [];
         renderVirtualTable();
+    });
+
+    document.getElementById("advMethodFileInput").addEventListener("change", async (e) => {
+        document.getElementById("advMethodInput").value = "Loading...";
+        const file = e.target.files[0];
+        if (!file) return;
+        const arrayBuffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(arrayBuffer);
+        try {
+            const analysis = await analyzeMod(bytes);
+            const stringAnalysis = analysis.join('\n');
+            document.getElementById("advMethodInput").value = stringAnalysis;
+            advancedMethodLines = stringAnalysis.split(/\r?\n/).map(line => line.trim()).filter(line => line);
+            renderVirtualTable();
+        } catch(err) {
+            console.error("Error analyzing DLL:", err);
+        }
     });
 
     setupWindowDrag(advWindow);

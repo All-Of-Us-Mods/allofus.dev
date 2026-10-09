@@ -236,6 +236,7 @@ li {
   color: var(--text-color);
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
+  text-align: center;
 }
 
 .button-base:hover {
