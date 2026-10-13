@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en">button-base
 
 <head>
   <meta charset="UTF-8" />
@@ -178,6 +178,8 @@
         placeholder="Enter method names, one per line..."></textarea>
       <button id="advMethodApply" class="button-base blue-btn">Apply Filter</button>
       <button id="advMethodClear" class="button-base red-btn">Clear Filter</button>
+      <input type="file" id="advMethodFileInput" accept=".dll" hidden />
+      <label for="advMethodFileInput" class="button-base green-btn">📁 Load Methods from DLL</label>
     </div>
     <div class="resize-handle"></div>
   </div>
@@ -194,7 +196,7 @@
   <div id="fullDropZone" class="full-drop-zone">
     <div class="drop-zone-message">📁 Drop your JSON file to load</div>
   </div>
-  <script src="/static/js/il2cpp.js?v=9"></script>
+  <script src="/static/js/il2cpp.js?v=10" type="module"></script>
 </body>
 
 </html>
